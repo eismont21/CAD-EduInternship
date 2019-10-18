@@ -62,7 +62,21 @@ class spline:
     #stops when the column is only "stop" elements long
     #returns that column as a list
     def de_boor(self, t, stop):
-        pass
+        knot_index = self.knots.knot_index(t)
+        d = [self.control_points[i + knot_index - self.degree] for i in range(self.degree + 1)]
+        #print(len(d));
+        for k in range(1, self.degree+1):
+            for j in range(self.degree, k-1, -1):
+                alphakj = (t - self.knots[j + knot_index - self.degree]) / (self.knots[j + 1 + knot_index - k] - self.knots[j + knot_index - self.degree])
+                d[j] = (1.0 - alphakj) * d[j-1] + alphakj * d[j]
+            if self.degree - (k-1) == stop:
+                break
+        #for el in d:
+        #    print(el)
+        #    print(" ")
+
+        return d[(len(d)-stop-1):]
+        #pass
 
     #adjusts the control points such that it represents the same function,
     #but with an added knot
@@ -244,4 +258,9 @@ class knots:
         self.knots.insert(i, t)
 
     def knot_index(self, v):
-        pass
+        n = len(self.knots)
+        for i in range(n-1):
+            if self.knots[i] <= v < self.knots[i + 1]:
+                return i
+        return 0
+        #pass
