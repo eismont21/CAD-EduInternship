@@ -4,6 +4,7 @@ from cagd.vec import vec2, vec3
 from cagd.polyline import polyline
 import cagd.utils as utils
 import copy
+import math
 from math import *
 
 class spline:
@@ -122,7 +123,63 @@ class spline:
     #generates a spline that interpolates the given points using the given mode
     #returns that spline object
     def interpolate_cubic(mode, points):
-        pass
+        #Parametrisierung
+        t = [0.] * len(points)
+
+        if mode == 0:
+            i = 0
+            while i < len(points):
+                t[i] = i
+                i = i + 1
+
+        elif mode == 1:
+            i = 1
+            while i < len(points):
+                t[i] = math.sqrt((points[i]-points[i-1]).x ** 2 + (points[i]-points[i-1]).y ** 2) + t[i-1]
+                i = i + 1
+
+        elif mode == 2:
+            i = 1
+            while i < len(points):
+                t[i] = ((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) ** 0.25 + t[i - 1]
+                i = i + 1
+
+        elif mode == 3:
+            d = [0.] * len(points)
+            i = 1
+            while i < len(points):
+                d[i] = math.sqrt((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) + d[i - 1]
+                i = i + 1
+            alpha = [0.] * len(points)
+            i = 1
+            while i < len(points)-1:
+                a1 = points[i-1].y - points[i].y
+                b1 = points[i].x - points[i-1].x
+                a2 = points[i].y - points[i+1].y
+                b2 = points[i+1].x - points[i].x
+                angle = math.acos((b1*b2 + a1*a2)/(math.sqrt(b1**2 + a1**2) * math.sqrt(b2**2 + a2**2)))
+                alpha[i] = min(math.pi - angle, math.pi/2)
+                i = i + 1
+            i = 1
+            while i < len(points):
+                if i == 1:
+                    k = 0
+                else:
+                    k = 3/2 * alpha[i-1]*d[i-2]/(d[i-2]+d[i-1])
+                l = 3/2 * alpha[i]*d[i]/(d[i]+d[i-1])
+                t[i] = d[i-1] * (1 + k + l) + t[i-1]
+                i = i + 1
+
+        #Knot vector
+        u = [0.] * (len(points)+4)
+        i = 0
+        while i < len(points):
+            u[i+2] = t[i] #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
+            i = i + 1
+        u[len(points)+3] = t[len(points)-1]
+        u[len(points)+2] = t[len(points)-1]
+
+
 
 
     #generates a spline that interpolates the given points and fulfills the definition
