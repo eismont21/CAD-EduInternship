@@ -64,6 +64,7 @@ class spline:
     #returns that column as a list
     def de_boor(self, t, stop):
         knot_index = self.knots.knot_index(t)
+        print("knot_index = ", knot_index)
         d = [self.control_points[i + knot_index - self.degree] for i in range(self.degree + 1)]
         #print(len(d));
         for k in range(1, self.degree+1):
@@ -168,23 +169,27 @@ class spline:
         #Knot vector
         u = [0.] * (n+5)
         for i in range(n):
-            u[i+3] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
+            u[i+4] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
         u[n+4] = float(t[n-1])
         u[n+3] = float(t[n-1])
+        u[n+2] = float(t[n-1])
+        u[n+1] = float(t[n-1])
 
-        knots_t = knots(len(u))
-        knots_t.knots = u
+
+        knots_t = knots(len(u)-1)
+        knots_t.knots = u[1:]
         s.knots = knots_t
         print("knots = ", u)
 
         #creating of the matrix
         p = [0.] * (n+1)
-        p[0] = s.de_boor(u[3], 1)
+        p[0] = s.de_boor(u[3], 1)[0].y
         p[1] = 0
-        p[n] = s.de_boor(u[n+3], 1)
+        p[n] = s.de_boor(u[n+3], 1)[0].y
         p[n-1] = 0
         for i in range(2, n):
-            p[i-1] = s.de_boor(u[i+2], 1)
+            print(i, sep=" ")
+            p[i-1] = s.de_boor(u[i+2], 1)[0].y
         main_diag = [0.] * (n + 1)
         under_diag = [0.] * (n + 1)
         upper_diag = [0.] * (n + 1)
@@ -193,17 +198,19 @@ class spline:
         main_diag[n] = 1
         upper_diag[n-1] = -1
         under_diag[0] = -1
-        for i in range(2, n+1):
+        for i in range(2, n):
+            print("i = ", i)
             ai = (u[i+2]-u[i])/(u[i+3] - u[i])
             bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
             ci = (u[i+2]-u[i+1])/(u[i+4] - u[i+1])
-            under_diag[i] = (1-bi)/(1-ai)
+            print("ai", ai, bi, ci, sep="\n")
+            under_diag[i] = (1-bi)*(1-ai)
             main_diag[i] = (1-bi)*ai + bi*(1-ci)
             upper_diag[i] = bi*ci
 
-        print("Diags main upper under:", main_diag, upper_diag, under_diag, sep="\n")
-
-
+        print("Diags main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
+        x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p)
+        return s
 
 
 
@@ -347,5 +354,5 @@ class knots:
         for i in range(n-1):
             if self.knots[i] <= v < self.knots[i + 1]:
                 return i
-        return i-1
+        return self.knots.index(max(self.knots))-1
         #pass

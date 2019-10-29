@@ -19,8 +19,7 @@ def solve_tridiagonal_equation(diag1, diag2, diag3, res):
     b = diag2
     d = res
 
-    i = 0
-    while i < n:
+    for i in range(n):
         z[i] = 1 / (b[i] - a[i] * v[i])
         if i != n - 1:
             v[i + 1] = z[i] * c[i]
@@ -28,16 +27,12 @@ def solve_tridiagonal_equation(diag1, diag2, diag3, res):
             y[i] = z[i] * d[i]
         else:
             y[i] = z[i] * (d[i] - a[i] * y[i - 1])
-        i = i + 1
 
     x[n - 1] = y[n - 1]
-    i = n - 2
-    while i > -1:
+    for i in range(n-2, -1, -1):
         x[i] = y[i] - v[i + 1] * x[i + 1]
-        i = i - 1
 
     return x
-     
 
 #solves the system of linear equations Ax = res
 #where A is an almost tridiagonal matrix with diag2 representing the main diagonal
