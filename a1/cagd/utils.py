@@ -13,11 +13,9 @@ def solve_tridiagonal_equation(diag1, diag2, diag3, res):
     x = [0] * n
     y = [0] * n
     v = [0] * n
-    a = [0]
-    a.extend(diag1)
+    a = diag1
     z = [0] * n
     c = diag3
-    c.append(0)
     b = diag2
     d = res
 
