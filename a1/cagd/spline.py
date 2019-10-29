@@ -124,60 +124,88 @@ class spline:
     #returns that spline object
     def interpolate_cubic(mode, points):
         #Parametrisierung
-        t = [0.] * len(points)
+        s = spline(3)
+        s.control_points = points
+        n = len(points)
+        t = [0.] * n
 
         if mode == 0:
-            i = 0
-            while i < len(points):
+            for i in range(n):
                 t[i] = i
-                i = i + 1
 
         elif mode == 1:
-            i = 1
-            while i < len(points):
+            for i in range(1, n):
                 t[i] = math.sqrt((points[i]-points[i-1]).x ** 2 + (points[i]-points[i-1]).y ** 2) + t[i-1]
-                i = i + 1
 
         elif mode == 2:
-            i = 1
-            while i < len(points):
+            for i in range(1, n):
                 t[i] = ((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) ** 0.25 + t[i - 1]
-                i = i + 1
 
         elif mode == 3:
-            d = [0.] * len(points)
-            i = 1
-            while i < len(points):
+            d = [0.] * n
+
+            for i in range(1, n):
                 d[i] = math.sqrt((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) + d[i - 1]
-                i = i + 1
-            alpha = [0.] * len(points)
-            i = 1
-            while i < len(points)-1:
+
+            alpha = [0.] * n
+
+            for i in range(1, n-1):
                 a1 = points[i-1].y - points[i].y
                 b1 = points[i].x - points[i-1].x
                 a2 = points[i].y - points[i+1].y
                 b2 = points[i+1].x - points[i].x
                 angle = math.acos((b1*b2 + a1*a2)/(math.sqrt(b1**2 + a1**2) * math.sqrt(b2**2 + a2**2)))
                 alpha[i] = min(math.pi - angle, math.pi/2)
-                i = i + 1
-            i = 1
-            while i < len(points):
+
+            for i in range(1, n):
                 if i == 1:
                     k = 0
                 else:
                     k = 3/2 * alpha[i-1]*d[i-2]/(d[i-2]+d[i-1])
                 l = 3/2 * alpha[i]*d[i]/(d[i]+d[i-1])
                 t[i] = d[i-1] * (1 + k + l) + t[i-1]
-                i = i + 1
 
         #Knot vector
-        u = [0.] * (len(points)+4)
-        i = 0
-        while i < len(points):
-            u[i+2] = t[i] #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
-            i = i + 1
-        u[len(points)+3] = t[len(points)-1]
-        u[len(points)+2] = t[len(points)-1]
+        u = [0.] * (n+5)
+        for i in range(n):
+            u[i+3] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
+        u[n+4] = float(t[n-1])
+        u[n+3] = float(t[n-1])
+
+        knots_t = knots(len(u))
+        knots_t.knots = u
+        s.knots = knots_t
+        print("knots = ", u)
+
+        #creating of the matrix
+        p = [0.] * (n+1)
+        p[0] = s.de_boor(u[3], 1)
+        p[1] = 0
+        p[n] = s.de_boor(u[n+3], 1)
+        p[n-1] = 0
+        for i in range(2, n):
+            p[i-1] = s.de_boor(u[i+2], 1)
+        main_diag = [0.] * (n + 1)
+        under_diag = [0.] * (n + 1)
+        upper_diag = [0.] * (n + 1)
+
+        main_diag[0] = 1
+        main_diag[n] = 1
+        upper_diag[n-1] = -1
+        under_diag[0] = -1
+        for i in range(2, n+1):
+            ai = (u[i+2]-u[i])/(u[i+3] - u[i])
+            bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
+            ci = (u[i+2]-u[i+1])/(u[i+4] - u[i+1])
+            under_diag[i] = (1-bi)/(1-ai)
+            main_diag[i] = (1-bi)*ai + bi*(1-ci)
+            upper_diag[i] = bi*ci
+
+        print("Diags main upper under:", main_diag, upper_diag, under_diag, sep="\n")
+
+
+
+
 
 
 
@@ -319,5 +347,5 @@ class knots:
         for i in range(n-1):
             if self.knots[i] <= v < self.knots[i + 1]:
                 return i
-        return 0
+        return i-1
         #pass
