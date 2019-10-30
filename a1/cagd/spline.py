@@ -64,7 +64,7 @@ class spline:
     #returns that column as a list
     def de_boor(self, t, stop):
         knot_index = self.knots.knot_index(t)
-        print("knot_index = ", knot_index)
+        #print("knot_index = ", knot_index)
         d = [self.control_points[i + knot_index - self.degree] for i in range(self.degree + 1)]
         #print(len(d));
         for k in range(1, self.degree+1):
@@ -195,22 +195,33 @@ class spline:
         under_diag = [0.] * (n + 2)
         upper_diag = [0.] * (n + 2)
 
-        main_diag[0] = 1.0
-        main_diag[n+1] = 1.0
-        upper_diag[n] = -1.0
-        under_diag[1] = -1.0
         for i in range(2, n):
-            print("i = ", i)
+            #print("i = ", i)
             ai = (u[i+2]-u[i])/(u[i+3] - u[i])
             bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
             ci = (u[i+2]-u[i+1])/(u[i+4] - u[i+1])
-            print("ai, bi, ci = ", ai, bi, ci, sep=" ", end="\n")
+            #print("ai, bi, ci = ", ai, bi, ci, sep=" ", end="\n")
             under_diag[i-1] = (1-bi)*(1-ai)
             main_diag[i-1] = (1-bi)*ai + bi*(1-ci)
             upper_diag[i-1] = bi*ci
 
-        print("Diags main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
-        x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p)
+        main_diag[0] = 1.0
+        main_diag[n + 1] = 1.0
+        main_diag[1] = 1 + (u[2 + 2] - u[2]) / (u[2 + 3] - u[2])
+        main_diag[n] = - ((u[n - 1 + 2] - u[n - 1 + 1]) / (u[n - 1 + 4] - u[n - 1 + 1])) + 2
+
+        upper_diag[n] = -1.0
+        upper_diag[n+1] = .0
+        upper_diag[0] = .0
+        upper_diag[1] = - (u[2 + 2] - u[2]) / (u[2 + 3] - u[2])
+
+        under_diag[0] = .0
+        under_diag[1] = -1.0
+        under_diag[n+1] = .0
+        under_diag[n] = -1.0 + (u[n - 1 + 2] - u[n - 1 + 1]) / (u[n - 1 + 4] - u[n - 1 + 1])
+
+
+        print("main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
         return s
 
 
