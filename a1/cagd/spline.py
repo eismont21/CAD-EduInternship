@@ -128,10 +128,10 @@ class spline:
         s = spline(3)
         s.control_points = points
         n = len(points)
-        t = [0.] * n
+        t = [0.] * (n-2)
 
         if mode == 0:
-            for i in range(n):
+            for i in range(n-2):
                 t[i] = i
 
         elif mode == 1:
@@ -167,19 +167,20 @@ class spline:
                 t[i] = d[i-1] * (1 + k + l) + t[i-1]
 
         #Knot vector
-        u = [0.] * (n+5)
-        for i in range(n):
+        m = len(t)
+        u = [0.] * (m+1+6)
+        u[0] = 0.0 #placeholder
+        u[1], u[2], u[3] = float(t[0]), float(t[0]), float(t[0])
+        for i in range(m):
             u[i+4] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
-        u[n+4] = float(t[n-1])
-        u[n+3] = float(t[n-1])
-        u[n+2] = float(t[n-1])
-        u[n+1] = float(t[n-1])
+        u[m+4], u[m+5], u[m+6] = float(t[m-1]), float(t[m-1]), float(t[m-1])
+
 
 
         knots_t = knots(len(u)-1)
         knots_t.knots = u[1:]
         s.knots = knots_t
-        print("knots = ", u)
+        print("u = ", u)
 
         #creating of the matrix
         p = [0.] * (n+2)
@@ -194,11 +195,11 @@ class spline:
         under_diag = [0.] * (n + 2)
         upper_diag = [0.] * (n + 2)
 
-        main_diag[0] = 1
-        main_diag[n+1] = 1
-        upper_diag[n] = -1
-        under_diag[1] = -1
-        for i in range(2, n+1):
+        main_diag[0] = 1.0
+        main_diag[n+1] = 1.0
+        upper_diag[n] = -1.0
+        under_diag[1] = -1.0
+        for i in range(2, n):
             print("i = ", i)
             ai = (u[i+2]-u[i])/(u[i+3] - u[i])
             bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
