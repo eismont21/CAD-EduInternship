@@ -207,18 +207,18 @@ class spline:
 
         main_diag[0] = 1.0
         main_diag[n + 1] = 1.0
-        main_diag[1] = 1 + (u[2 + 2] - u[2]) / (u[2 + 3] - u[2])
-        main_diag[n] = - ((u[n - 1 + 2] - u[n - 1 + 1]) / (u[n - 1 + 4] - u[n - 1 + 1])) + 2
+        main_diag[1] = 1 + (u[4] - u[2]) / (u[5] - u[2])
+        main_diag[n] = - (u[n+1] - u[n]) / (u[n+3] - u[n]) + 2
 
         upper_diag[n] = -1.0
         upper_diag[n+1] = .0
         upper_diag[0] = .0
-        upper_diag[1] = - (u[2 + 2] - u[2]) / (u[2 + 3] - u[2])
+        upper_diag[1] = - (u[4] - u[2]) / (u[5] - u[2])
 
         under_diag[0] = .0
         under_diag[1] = -1.0
         under_diag[n+1] = .0
-        under_diag[n] = -1.0 + (u[n - 1 + 2] - u[n - 1 + 1]) / (u[n - 1 + 4] - u[n - 1 + 1])
+        under_diag[n] = -1.0 + (u[n+1] - u[n]) / (u[n+3] - u[n])
 
 
         print("main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
