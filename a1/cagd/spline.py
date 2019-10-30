@@ -135,11 +135,11 @@ class spline:
                 t[i] = i
 
         elif mode == 1:
-            for i in range(1, n):
+            for i in range(1, n-2):
                 t[i] = math.sqrt((points[i]-points[i-1]).x ** 2 + (points[i]-points[i-1]).y ** 2) + t[i-1]
 
         elif mode == 2:
-            for i in range(1, n):
+            for i in range(1, n-2):
                 t[i] = ((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) ** 0.25 + t[i - 1]
 
         elif mode == 3:
@@ -158,7 +158,7 @@ class spline:
                 angle = math.acos((b1*b2 + a1*a2)/(math.sqrt(b1**2 + a1**2) * math.sqrt(b2**2 + a2**2)))
                 alpha[i] = min(math.pi - angle, math.pi/2)
 
-            for i in range(1, n):
+            for i in range(1, n-2):
                 if i == 1:
                     k = 0
                 else:
