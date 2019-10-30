@@ -77,7 +77,7 @@ class spline:
         #    print(el)
         #    print(" ")
 
-        return d[(len(d)-stop-1):]
+        return d[(len(d)-stop):]
         #pass
 
     #adjusts the control points such that it represents the same function,
@@ -182,31 +182,31 @@ class spline:
         print("knots = ", u)
 
         #creating of the matrix
-        p = [0.] * (n+1)
+        p = [0.] * (n+2)
         p[0] = s.de_boor(u[3], 1)[0].y
         p[1] = 0
-        p[n] = s.de_boor(u[n+3], 1)[0].y
-        p[n-1] = 0
+        p[n+1] = s.de_boor(u[n+2], 1)[0].y
+        p[n] = 0
         for i in range(2, n):
-            print(i, sep=" ")
-            p[i-1] = s.de_boor(u[i+2], 1)[0].y
-        main_diag = [0.] * (n + 1)
-        under_diag = [0.] * (n + 1)
-        upper_diag = [0.] * (n + 1)
+            p[i] = s.de_boor(u[i+2], 1)[0].y
+
+        main_diag = [0.] * (n + 2)
+        under_diag = [0.] * (n + 2)
+        upper_diag = [0.] * (n + 2)
 
         main_diag[0] = 1
-        main_diag[n] = 1
-        upper_diag[n-1] = -1
-        under_diag[0] = -1
-        for i in range(2, n):
+        main_diag[n+1] = 1
+        upper_diag[n] = -1
+        under_diag[1] = -1
+        for i in range(2, n+1):
             print("i = ", i)
             ai = (u[i+2]-u[i])/(u[i+3] - u[i])
             bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
             ci = (u[i+2]-u[i+1])/(u[i+4] - u[i+1])
-            print("ai", ai, bi, ci, sep="\n")
-            under_diag[i] = (1-bi)*(1-ai)
-            main_diag[i] = (1-bi)*ai + bi*(1-ci)
-            upper_diag[i] = bi*ci
+            print("ai, bi, ci = ", ai, bi, ci, sep=" ", end="\n")
+            under_diag[i-1] = (1-bi)*(1-ai)
+            main_diag[i-1] = (1-bi)*ai + bi*(1-ci)
+            upper_diag[i-1] = bi*ci
 
         print("Diags main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
         x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p)
@@ -355,4 +355,3 @@ class knots:
             if self.knots[i] <= v < self.knots[i + 1]:
                 return i
         return self.knots.index(max(self.knots))-1
-        #pass
