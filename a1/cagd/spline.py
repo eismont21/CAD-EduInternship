@@ -222,6 +222,7 @@ class spline:
 
 
         print("main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
+        #x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p)
         return s
 
 
