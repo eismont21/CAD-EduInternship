@@ -201,9 +201,9 @@ class spline:
             bi = (u[i+2]-u[i+1])/(u[i+3] - u[i+1])
             ci = (u[i+2]-u[i+1])/(u[i+4] - u[i+1])
             #print("ai, bi, ci = ", ai, bi, ci, sep=" ", end="\n")
-            under_diag[i-1] = (1-bi)*(1-ai)
-            main_diag[i-1] = (1-bi)*ai + bi*(1-ci)
-            upper_diag[i-1] = bi*ci
+            under_diag[i] = (1-bi)*(1-ai)
+            main_diag[i] = (1-bi)*ai + bi*(1-ci)
+            upper_diag[i] = bi*ci
 
         main_diag[0] = 1.0
         main_diag[n + 1] = 1.0
