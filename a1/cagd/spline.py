@@ -124,10 +124,11 @@ class spline:
     #generates a spline that interpolates the given points using the given mode
     #returns that spline object
     def interpolate_cubic(mode, points):
-        #Parametrisierung
         s = spline(3)
         s.control_points = points
         n = len(points)
+
+        # Parametrisierung
         t = [0.] * (n-2)
 
         if mode == 0:
@@ -172,10 +173,8 @@ class spline:
         u[0] = 0.0 #placeholder
         u[1], u[2], u[3] = float(t[0]), float(t[0]), float(t[0]) #t1 =t2 = t3
         for i in range(m):
-            u[i+4] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
+            u[i+4] = float(t[i])
         u[m+4], u[m+5], u[m+6] = float(t[m-1]), float(t[m-1]), float(t[m-1])
-
-
 
         knots_t = knots(len(u)-1)
         knots_t.knots = u[1:]
@@ -224,7 +223,6 @@ class spline:
         under_diag[1] = -1.0
         under_diag[n+1] = .0
         under_diag[n] = -1.0 + (u[n+1] - u[n]) / (u[n+3] - u[n])
-
 
         p_x = [el.x for el in p]
         p_y = [el.y for el in p]
