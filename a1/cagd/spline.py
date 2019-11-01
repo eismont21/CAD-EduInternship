@@ -168,9 +168,9 @@ class spline:
 
         #Knot vector
         m = len(t)
-        u = [0.] * (m+1+6)
+        u = [0.] * (m+1+6) #corresponds t in Assignment, 1 is placeholder , 6 is adding 3 points left and 3 points right
         u[0] = 0.0 #placeholder
-        u[1], u[2], u[3] = float(t[0]), float(t[0]), float(t[0])
+        u[1], u[2], u[3] = float(t[0]), float(t[0]), float(t[0]) #t1 =t2 = t3
         for i in range(m):
             u[i+4] = float(t[i]) #индексы хз, в (8) они с 0 начинают или как, просто тогда первые четыре всегда 0 будут, потому что т0 всегда 0, сложнаааа
         u[m+4], u[m+5], u[m+6] = float(t[m-1]), float(t[m-1]), float(t[m-1])
@@ -182,15 +182,20 @@ class spline:
         s.knots = knots_t
         print("u = ", u)
 
-        #creating of the matrix
-        p = [0.] * (n+2)
-        p[0] = s.de_boor(u[3], 1)[0].y
-        p[1] = 0
-        p[n+1] = s.de_boor(u[n+2], 1)[0].y
-        p[n] = 0
-        for i in range(2, n):
-            p[i] = s.de_boor(u[i+2], 1)[0].y
+        #creating of the equation Ax=p
+        #A is tridiagonal and consists of main_diag, upper_diag and under_diag
+        #p consists of elements of type vec2 namely points
 
+        #calculating p
+        p = [0.] * (n+2)
+        p[0] = s.de_boor(u[3], 1)[0]
+        p[1] = vec2(0.0, 0.0)
+        p[n+1] = s.de_boor(u[n+2], 1)[0]
+        p[n] = vec2(0.0, 0.0)
+        for i in range(2, n):
+            p[i] = s.de_boor(u[i+2], 1)[0]
+
+        #calculating A
         main_diag = [0.] * (n + 2)
         under_diag = [0.] * (n + 2)
         upper_diag = [0.] * (n + 2)
@@ -221,8 +226,12 @@ class spline:
         under_diag[n] = -1.0 + (u[n+1] - u[n]) / (u[n+3] - u[n])
 
 
-        print("main upper under p:", main_diag, upper_diag, under_diag, p, sep="\n")
-        #x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p)
+        p_x = [el.x for el in p]
+        p_y = [el.y for el in p]
+        print("main upper under p_x p_y:", main_diag, upper_diag, under_diag, p_x, p_y, sep="\n")
+
+        #solve equation Ax = p
+        x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p) # divion by 0!!!
         return s
 
 
