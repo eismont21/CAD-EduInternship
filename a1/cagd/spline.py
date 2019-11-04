@@ -159,7 +159,7 @@ class spline:
                 angle = math.acos((b1*b2 + a1*a2)/(math.sqrt(b1**2 + a1**2) * math.sqrt(b2**2 + a2**2)))
                 alpha[i] = min(math.pi - angle, math.pi/2)
 
-            for i in range(1, n-2):
+            for i in range(1, n):
                 if i == 1:
                     k = 0
                 else:
