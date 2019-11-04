@@ -169,15 +169,14 @@ class spline:
 
         #Knot vector
         m = len(t)
-        u = [0.] * (m+1+6) #corresponds t in Assignment, 1 is placeholder , 6 is adding 3 points left and 3 points right
-        u[0] = 0.0 #placeholder
-        u[1], u[2], u[3] = float(t[0]), float(t[0]), float(t[0]) #t1 =t2 = t3
+        u = [0.] * (m+6) #corresponds t in Assignment, 6 is adding 3 points left and 3 points right
+        u[0], u[1], u[2] = float(t[0]), float(t[0]), float(t[0]) #t1 =t2 = t3
         for i in range(m):
-            u[i+4] = float(t[i])
-        u[m+4], u[m+5], u[m+6] = float(t[m-1]), float(t[m-1]), float(t[m-1])
+            u[i+3] = float(t[i])
+        u[m+3], u[m+4], u[m+5] = float(t[m-1]), float(t[m-1]), float(t[m-1])
 
-        knots_t = knots(len(u)-1)
-        knots_t.knots = u[1:]
+        knots_t = knots(len(u))
+        knots_t.knots = u
         s.knots = knots_t
         print("u = ", u)
 
@@ -229,6 +228,7 @@ class spline:
 
         #solve equation Ax = p
         x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p) # divion by 0!!!
+        s.control_points = x
         return s
 
 

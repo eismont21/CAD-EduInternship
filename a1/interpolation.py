@@ -20,12 +20,12 @@ p.set_color("red")
 #uncomment these lines once you implemented the spline interpolation
 pts = [vec2(0,.4), vec2(.8,.8), vec2(.5,1.2), vec2(-.03,.4), vec2(.4,0), vec2(1,.2)]
 s1 = spline.interpolate_cubic(spline.INTERPOLATION_EQUIDISTANT, pts)
-#s2 = spline.interpolate_cubic(spline.INTERPOLATION_CHORDAL, pts)
-#s3 = spline.interpolate_cubic(spline.INTERPOLATION_CENTRIPETAL, pts)
+s2 = spline.interpolate_cubic(spline.INTERPOLATION_CHORDAL, pts)
+s3 = spline.interpolate_cubic(spline.INTERPOLATION_CENTRIPETAL, pts)
 #s4 = spline.interpolate_cubic(spline.INTERPOLATION_FOLEY, pts)
-#s1.set_color("#000066")
-#s2.set_color("#0000aa")
-#s3.set_color("#6666ff")
+s1.set_color("#000066")
+s2.set_color("#0000aa")
+s3.set_color("#6666ff")
 #s4.set_color("#aaaaff")
 p = polyline()
 p.points = pts
@@ -34,11 +34,11 @@ p.set_color("red")
 #generate a scene and add elements to it
 sc = scene_2d.scene()
 sc.set_resolution(900)
-sc.add_element(example_spline)
+#sc.add_element(example_spline)
 sc.add_element(p)
 sc.add_element(s1)
-#sc.add_element(s2)
-#sc.add_element(s3)
+sc.add_element(s2)
+sc.add_element(s3)
 #sc.add_element(s4)
 sc.write_image()    #compose all elements in the scene
 sc.show()           #tries to show the image with a default viewer
