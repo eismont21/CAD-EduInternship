@@ -146,8 +146,9 @@ class spline:
         elif mode == 3:
             d = [0.] * n
 
-            for i in range(1, n):
-                d[i] = math.sqrt((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) + d[i - 1]
+            #chordale and d[m]=0
+            for i in range(0, n-1):
+                d[i] = math.sqrt((points[i+1] - points[i]).x ** 2 + (points[i+1] - points[i]).y ** 2)
 
             alpha = [0.] * n
 
@@ -166,6 +167,7 @@ class spline:
                     k = 3/2 * alpha[i-1]*d[i-2]/(d[i-2]+d[i-1])
                 l = 3/2 * alpha[i]*d[i]/(d[i]+d[i-1])
                 t[i] = d[i-1] * (1 + k + l) + t[i-1]
+            #print(t)
 
         #Knot vector
         m = len(t)
@@ -178,7 +180,7 @@ class spline:
         knots_t = knots(len(u))
         knots_t.knots = u
         s.knots = knots_t
-        print("u = ", u)
+        #print("u = ", u)
 
         #creating of the equation Ax=p
         #A is tridiagonal and consists of main_diag, upper_diag and under_diag
@@ -224,7 +226,7 @@ class spline:
 
         p_x = [el.x for el in p]
         p_y = [el.y for el in p]
-        print("main upper under p_x p_y:", main_diag, upper_diag, under_diag, p_x, p_y, sep="\n")
+        #print("main upper under p_x p_y:", main_diag, upper_diag, under_diag, p_x, p_y, sep="\n")
 
         #solve equation Ax = p
         x = utils.solve_tridiagonal_equation(under_diag, main_diag, upper_diag, p) # divion by 0!!!
