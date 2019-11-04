@@ -129,18 +129,18 @@ class spline:
         n = len(points)
 
         # Parametrisierung
-        t = [0.] * (n-2)
+        t = [0.] * (n)
 
         if mode == 0:
-            for i in range(n-2):
+            for i in range(n):
                 t[i] = i
 
         elif mode == 1:
-            for i in range(1, n-2):
+            for i in range(1, n):
                 t[i] = math.sqrt((points[i]-points[i-1]).x ** 2 + (points[i]-points[i-1]).y ** 2) + t[i-1]
 
         elif mode == 2:
-            for i in range(1, n-2):
+            for i in range(1, n):
                 t[i] = ((points[i] - points[i - 1]).x ** 2 + (points[i] - points[i - 1]).y ** 2) ** 0.25 + t[i - 1]
 
         elif mode == 3:
@@ -186,13 +186,12 @@ class spline:
         #p consists of elements of type vec2 namely points
 
         #calculating p
-        p = [0.] * (n+2)
-        p[0] = s.de_boor(u[3], 1)[0]
+        p = [0] * (n+2)
+        p[0] = points[0]
         p[1] = vec2(0.0, 0.0)
-        p[n+1] = s.de_boor(u[n+2], 1)[0]
+        p[n+1] = points[n-1]
         p[n] = vec2(0.0, 0.0)
-        for i in range(2, n):
-            p[i] = s.de_boor(u[i+2], 1)[0]
+        p[2:n] = points[1:(n-1)]
 
         #calculating A
         main_diag = [0.] * (n + 2)
