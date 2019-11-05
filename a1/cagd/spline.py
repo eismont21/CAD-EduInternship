@@ -237,32 +237,27 @@ class spline:
     #of a periodic spline
     #returns that spline object
     def interpolate_cubic_periodic(points):
-        points.append(points[0]) # pm=p0
-        points.append(points[1])
-        points.append(points[2])
         s = spline(3)
-        s.control_points = points
-        n = len(points)
+        n = len(points) + 3 # len(points) + degree
 
-        u = [0] * (n-1 + 3 + 1 + 1)
-        for i in range(n-1 + 3 + 1 + 1):
+        # Knot vector
+        u = [0] * (n+4) # m(=n-1) + degree(=3) + 1 + 1
+        for i in range(n+4):
             u[i] = i
-        #print(u)
         knots_t = knots(len(u))
         knots_t.knots = u
         s.knots = knots_t
 
-        main_diag = [4/6] * (n-3)
+        # calculating A
+        main_diag = [2/3] * (n-3)
         under_diag = [1/6] * (n-3)
         upper_diag = [1/6] * (n-3)
 
-        points.pop()
-        points.pop()
-        points.pop()
-        x = utils.solve_almost_tridiagonal_equation(under_diag, main_diag, upper_diag, points) #решение лгс без последнего повторяющегося элемента
-        x.insert(0, x[len(x)-1]) #d0 = dm
-        x.append(x[1])
-        x.append(x[2])
+        # solve equation Ax = p
+        x = utils.solve_almost_tridiagonal_equation(under_diag, main_diag, upper_diag, points)
+        x.insert(0, x[len(x)-1]) # d[0] = d[m]
+        x.append(x[1]) # d[m+1] = d[1]
+        x.append(x[2]) # d[m+2] = d[2]
         s.control_points = x
         return s
 
