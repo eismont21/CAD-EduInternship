@@ -1,9 +1,9 @@
 #!/usr/bin/python
 
-import cagd.scene_2d as scene
-from cagd.vec import vec2
-from cagd.spline import spline, knots
 from cagd.polyline import polyline
+from cagd.spline import spline, knots
+from cagd.vec import vec2
+import cagd.scene_2d as scene_2d
 
 #returns a list of num_samples points that are uniformly distributed on the unit circle
 def unit_circle_points(num_samples):
@@ -19,7 +19,7 @@ pts = [vec2( 0, 2.5), vec2(-1, 1), vec2( 1,-1), vec2( 0,-2.5), vec2(-1,-1), vec2
 s = spline.interpolate_cubic_periodic(pts)
 p = s.get_polyline_from_control_points()
 p.set_color("blue")
-sc = scene.scene()
+sc = scene_2d.scene()
 sc.set_resolution(900)
 sc.add_element(s)
 sc.add_element(p)

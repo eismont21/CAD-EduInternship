@@ -129,7 +129,7 @@ class spline:
         n = len(points)
 
         # Parametrisierung
-        t = [0.] * (n)
+        t = [0.] * n
 
         if mode == 0:
             for i in range(n):
@@ -146,7 +146,7 @@ class spline:
         elif mode == 3:
             d = [0.] * n
 
-            #chordale and d[m]=0
+            #chordale
             for i in range(0, n-1):
                 d[i] = math.sqrt((points[i+1] - points[i]).x ** 2 + (points[i+1] - points[i]).y ** 2)
 
@@ -233,16 +233,34 @@ class spline:
         s.control_points = x
         return s
 
-
-
-
-
-
     #generates a spline that interpolates the given points and fulfills the definition
     #of a periodic spline
     #returns that spline object
     def interpolate_cubic_periodic(points):
-        pass
+        points.append(points[0]) # pm=p0
+        #points.append(points[1])
+        #points.append(points[2])
+        s = spline(3)
+        s.control_points = points
+        n = len(points)
+
+        u = [0] * (n-1 + 3 + 1 + 1)
+        for i in range(n-1 + 3 + 1 + 1):
+            u[i] = i
+        #print(u)
+        knots_t = knots(len(u))
+        knots_t.knots = u
+        s.knots = knots_t
+
+        main_diag = [4/6] * (n-1)
+        under_diag = [1/6] * (n-1)
+        upper_diag = [1/6] * (n-1)
+
+        points.pop()
+        x = utils.solve_almost_tridiagonal_equation(under_diag, main_diag, upper_diag, points) #решение лгс без последнего повторяющегося элемента
+        x.insert(0, x[len(x)-1]) #d0 = dm
+        s.control_points = x
+        return s
 
     #for splines of degree 3, generate a parallel spline with distance dist
     #the returned spline is off from the exact parallel by at most eps
