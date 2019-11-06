@@ -12,6 +12,7 @@ def unit_circle_points(num_samples):
     return [vec2(cos(a*i), sin(a*i)) for i in range(num_samples)]
 
 #calculates the deviation between the given spline and a unit circle
+#the Manhattan Metrics is chosen
 def calculate_circle_deviation(spline):
     ideal_d = 1.0
     center_x = 0.0
@@ -25,14 +26,14 @@ def calculate_circle_deviation(spline):
 
 
 #interpolate 6 points with a periodic spline to create the number "8"
-#pts = [vec2( 0, 2.5), vec2(-1, 1), vec2( 1,-1), vec2( 0,-2.5), vec2(-1,-1), vec2(1,1)]
-#s = spline.interpolate_cubic_periodic(pts)
-#p = s.get_polyline_from_control_points()
-#p.set_color("blue")
+pts = [vec2( 0, 2.5), vec2(-1, 1), vec2( 1,-1), vec2( 0,-2.5), vec2(-1,-1), vec2(1,1)]
+s = spline.interpolate_cubic_periodic(pts)
+p = s.get_polyline_from_control_points()
+p.set_color("blue")
 sc = scene_2d.scene()
 sc.set_resolution(900)
-#sc.add_element(s)
-#sc.add_element(p)
+sc.add_element(s)
+sc.add_element(p)
 
 #generate a spline that approximates the unit circle
 n = 8
