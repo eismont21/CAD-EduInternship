@@ -4,7 +4,7 @@ from cagd.polyline import polyline
 from cagd.spline import spline, knots
 from cagd.vec import vec2
 import cagd.scene_2d as scene_2d
-from math import sin,cos,pi
+from math import sin,cos,pi, sqrt
 
 #returns a list of num_samples points that are uniformly distributed on the unit circle
 def unit_circle_points(num_samples):
@@ -13,7 +13,15 @@ def unit_circle_points(num_samples):
 
 #calculates the deviation between the given spline and a unit circle
 def calculate_circle_deviation(spline):
-    return None
+    ideal_d = 1.0
+    center_x = 0.0
+    center_y = 0.0
+    deviation = 0.0
+    for p in spline.control_points:
+        deviation += sqrt((p.x - center_x)**2 + (p.y - center_y)**2)
+    deviation /= len(spline.control_points)
+    deviation -= ideal_d
+    return deviation
 
 
 #interpolate 6 points with a periodic spline to create the number "8"
@@ -29,12 +37,13 @@ sc.set_resolution(900)
 #generate a spline that approximates the unit circle
 n = 8
 circle_pts = unit_circle_points(n)
-for el in circle_pts:
-    print(el.x, el.y)
 circle = spline.interpolate_cubic_periodic(circle_pts)
+p_circle = circle.get_polyline_from_control_points()
 sc.add_element(circle)
-#error = calculate_circle_deviation(circle)
-#print("The error is: " + str(error))
+sc.add_element(p_circle)
+p_circle.set_color("blue")
+error = calculate_circle_deviation(circle)
+print("The error is: " + str(error))
 
 sc.write_image()
 sc.show()
