@@ -36,12 +36,12 @@ sc.add_element(s)
 sc.add_element(p)
 
 #generate a spline that approximates the unit circle
-n = 8
+n = 100
 circle_pts = unit_circle_points(n)
 circle = spline.interpolate_cubic_periodic(circle_pts)
 p_circle = circle.get_polyline_from_control_points()
-sc.add_element(circle)
-sc.add_element(p_circle)
+#sc.add_element(circle)
+#sc.add_element(p_circle)
 p_circle.set_color("blue")
 error = calculate_circle_deviation(circle)
 print("The error is: " + str(error))
