@@ -45,9 +45,8 @@ class spline:
 
     def tangent(self, t):
         a, b = self.support()
-        print("a, t, b = ", a, t,  b, sep=", ")
-
-        #assert(a <= t <= b)
+        #print(a, b , t)
+        assert(a <= t <= b)
         if t == self.knots[len(self.knots) - self.degree - 1]:
             #the spline is only defined on the interval [a, b)
             #it is useful to define self(b) as lim t->b self(t)
@@ -270,39 +269,22 @@ class spline:
         s_parallel = spline(3)
         s_parallel.knots = self.knots
         pts = []
-        counter = 0
-        for p in self.control_points:
 
-            #a, b = self.support()
-            #print("a, b, t = ", a, b, p.x, sep=", ")
-            #if not((a <= p.x <= b)):
-            #    continue
+        knotss = [self(t) for t in self.knots]
+        for i in range(len(knotss)):
+            #print("p = ", p.x, p.y)
+            tang = self.tangent(self.knots[i])
 
-            tang = self.tangent(p.x)
-            x, y = 0.0, 0.0
-            if tang.x != 0:
-                y = 1.0
-                x = -(tang.y * y)/(tang.x)
-            elif tang.x == 0 and tang.y != 0:
-                x = 1.0
-                y = -(tang.x * x)/(tang.y)
-            x = (x/sqrt(x**2 + y**2))*dist
-            y = (y/sqrt(x**2 + y**2))*dist
+            x = (tang.y/sqrt(tang.x**2 + tang.y**2))*dist
+            y = -(tang.x/sqrt(tang.x**2 + tang.y**2))*dist
 
-            '''
-            if counter == 0 or counter == (len(self.control_points) - 1):
-                x = p.x
-                y = p.y + dist
-                counter += 1
-                pts.append(vec2(x, y))
-                continue
-            '''
-            counter += 1
-            pts.append(vec2(p.x + x, p.y + y))
+            pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
 
-        s_parallel.control_points = pts
-        return s_parallel
-
+        pts_x = [p.x for p in pts]
+        pts_y = [p.y for p in pts]
+        print(pts_x, pts_y, sep="\n")
+        s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
+        return s
 
 class spline_surface:
     #the two directions of the parameter space
