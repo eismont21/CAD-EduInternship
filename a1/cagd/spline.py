@@ -45,7 +45,7 @@ class spline:
 
     def tangent(self, t):
         a, b = self.support()
-        print("a, b, t = ", a, b, t, sep=", ")
+        print("a, t, b = ", a, t,  b, sep=", ")
 
         #assert(a <= t <= b)
         if t == self.knots[len(self.knots) - self.degree - 1]:
@@ -267,8 +267,8 @@ class spline:
     #the returned spline is off from the exact parallel by at most eps
     def generate_parallel(self, dist, eps):
         assert(self.degree == 3)
-        #s_parallel = spline()
-        #s_parallel.knots = self.knots
+        s_parallel = spline(3)
+        s_parallel.knots = self.knots
         pts = []
         counter = 0
         for p in self.control_points:
@@ -277,6 +277,7 @@ class spline:
             #print("a, b, t = ", a, b, p.x, sep=", ")
             #if not((a <= p.x <= b)):
             #    continue
+
             tang = self.tangent(p.x)
             x, y = 0.0, 0.0
             if tang.x != 0:
@@ -287,6 +288,7 @@ class spline:
                 y = -(tang.x * x)/(tang.y)
             x = (x/sqrt(x**2 + y**2))*dist
             y = (y/sqrt(x**2 + y**2))*dist
+
             '''
             if counter == 0 or counter == (len(self.control_points) - 1):
                 x = p.x
@@ -298,7 +300,8 @@ class spline:
             counter += 1
             pts.append(vec2(p.x + x, p.y + y))
 
-        return pts
+        s_parallel.control_points = pts
+        return s_parallel
 
 
 class spline_surface:
