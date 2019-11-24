@@ -84,7 +84,7 @@ class spline:
     #adjusts the control points such that it represents the same function,
     #but with an added knot
     def insert_knot(self, t):
-        pass
+        self.knots.insert(t)
 
     def get_axis_aligned_bounding_box(self):
         min_vec = copy.copy(self.control_points[0])
@@ -283,9 +283,10 @@ class spline:
         #print(pts_x, pts_y, sep="\n")
         s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
 
+        #Setzen Sie daher die Knoten des parallelen Splines auf die Knoten des Eingabesplines.
+        self.knots = s.knots
+        knotss = [self(t) for t in self.knots]
         knotss_new = [s(t) for t in s.knots]
-        #knots vector of the old spline
-        a = [t for t in self.knots]
         for i in range(len(knotss_new)-1):
             #old spline
             middle_x = (knotss[i+1].x + knotss[i].x)/2
@@ -293,25 +294,19 @@ class spline:
             #new spline
             middle_x2 = (knotss_new[i + 1].x + knotss_new[i].x) / 2
             middle_y2 = (knotss_new[i+1].y + knotss_new[i].y)/2
-            #calculate dist
+            #Jetzt soll in der Mitte zwischen zwei Knoten die Distanz der Splines berechnet werden.
             middle_dist = sqrt((middle_x-middle_x2)**2+(middle_y-middle_y2)**2)
 
             if (abs(middle_dist-dist) > eps):
-                #add the middle knot with error to knots vector
-                a.append((self.knots[i+1] + self.knots[i])/2)
-                #print(knotss[i].x, knotss_new[i].x, knotss[i].y, knotss_new[i].y, abs(middle_dist-dist))
+                #Bei einer Abweichung von mehr als eps von der geforderten Distanz soll an dieser Stelle
+                #ein neuer Knoten in den originalen Spline eingefügt werden um eine bessere Approximation zu gewinnen.
 
-        #sort knots vector
-        a.sort()
-        #заново все считаю по рабочему алгоритму, но с новым кнотсвектором
-        pts = []
-        knotss = [self(t) for t in a]
-        for i in range(len(knotss)):
-            tang = self.tangent(a[i])
-            x = (tang.y / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
-            y = -(tang.x / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
-            pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
-        s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
+                # README
+                # если ты раскоммитишь след строчку добавления, то получишь ошибку питона, я хз почему, уже заебавси
+                #self.insert_knot((self.knots[i+1] + self.knots[i])/2)
+                continue
+
+                #print(knotss[i].x, knotss_new[i].x, knotss[i].y, knotss_new[i].y, abs(middle_dist-dist))
         return s
 
 class spline_surface:
