@@ -274,15 +274,43 @@ class spline:
         for i in range(len(knotss)):
             #print("p = ", p.x, p.y)
             tang = self.tangent(self.knots[i])
-
             x = (tang.y/sqrt(tang.x**2 + tang.y**2))*dist
             y = -(tang.x/sqrt(tang.x**2 + tang.y**2))*dist
-
             pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
 
         pts_x = [p.x for p in pts]
         pts_y = [p.y for p in pts]
-        print(pts_x, pts_y, sep="\n")
+        #print(pts_x, pts_y, sep="\n")
+        s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
+
+        knotss_new = [s(t) for t in s.knots]
+        #knots vector of the old spline
+        a = [t for t in self.knots]
+        for i in range(len(knotss_new)-1):
+            #old spline
+            middle_x = (knotss[i+1].x + knotss[i].x)/2
+            middle_y = (knotss[i + 1].y + knotss[i].y) / 2
+            #new spline
+            middle_x2 = (knotss_new[i + 1].x + knotss_new[i].x) / 2
+            middle_y2 = (knotss_new[i+1].y + knotss_new[i].y)/2
+            #calculate dist
+            middle_dist = sqrt((middle_x-middle_x2)**2+(middle_y-middle_y2)**2)
+
+            if (abs(middle_dist-dist) > eps):
+                #add the middle knot with error to knots vector
+                a.append((self.knots[i+1] + self.knots[i])/2)
+                #print(knotss[i].x, knotss_new[i].x, knotss[i].y, knotss_new[i].y, abs(middle_dist-dist))
+
+        #sort knots vector
+        a.sort()
+        #заново все считаю по рабочему алгоритму, но с новым кнотсвектором
+        pts = []
+        knotss = [self(t) for t in a]
+        for i in range(len(knotss)):
+            tang = self.tangent(a[i])
+            x = (tang.y / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
+            y = -(tang.x / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
+            pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
         s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
         return s
 
