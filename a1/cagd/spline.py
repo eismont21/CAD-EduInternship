@@ -281,8 +281,8 @@ class spline:
             print(counter)
             counter += 1
             flag = False
-            knotss = [self(t) for t in self.knots]
-            knotss_new = [s(t) for t in s.knots]
+            knotss = [self(t) for t in self.knots[3:-3]]
+            knotss_new = [s(t) for t in s.knots[3:-3]]
             for i in range(len(knotss_new) - 1):
                 # old spline
                 middle_old = (knotss[i + 1] + knotss[i]) * 0.5
@@ -294,7 +294,7 @@ class spline:
                     flag = True
                     # Bei einer Abweichung von mehr als eps von der geforderten Distanz soll an dieser Stelle
                     # ein neuer Knoten in den originalen Spline eingefügt werden um eine bessere Approximation zu gewinnen.
-                    self.insert_knot((self.knots[i + 1] + self.knots[i]) / 2)
+                    self.insert_knot((self.knots[3:-3][i + 1] + self.knots[3:-3][i]) / 2)
             if flag:
                 s = self.construct_parallel(dist)
                 self.knots = s.knots
