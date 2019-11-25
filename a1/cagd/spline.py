@@ -86,17 +86,18 @@ class spline:
     def insert_knot(self, t):
         print("knot to insert:", t)
         print("knots before insert: ",self.knots.knots[3:-3])
-        self.knots.insert(t)
-        print("knots after insert: ",self.knots.knots[3:-3], end="\n\n")
+        #self.knots.insert(t)
+        #print("knots after insert: ",self.knots.knots[3:-3], end="\n\n")
         index = self.knots.knot_index(t)
-        ctrl_pts =[]
-        a = (t-self.knots[index-1])/(self.knots[index-1+self.degree] - self.knots[index-1])
-        ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 2])+a*self.control_points[index-1])
-        a = (t-self.knots[index-2])/(self.knots[index-2+self.degree] - self.knots[index-2])
-        ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 3])+a*self.control_points[index-2])
-        a = (t-self.knots[index-3])/(self.knots[index-3+self.degree] - self.knots[index-3])
-        ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 4])+a*self.control_points[index-3])
-        #ctrl_pts = self.de_boor(t, 3)
+
+        #ctrl_pts =[]
+        #a = (t-self.knots[index-1])/(self.knots[index-1+self.degree] - self.knots[index-1])
+        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 2])+a*self.control_points[index-1])
+        #a = (t-self.knots[index-2])/(self.knots[index-2+self.degree] - self.knots[index-2])
+        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 3])+a*self.control_points[index-2])
+        #a = (t-self.knots[index-3])/(self.knots[index-3+self.degree] - self.knots[index-3])
+        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 4])+a*self.control_points[index-3])
+        ctrl_pts = self.de_boor(t, 3)
         control_pts_x = [p.x for p in ctrl_pts]
         control_pts_y = [p.y for p in ctrl_pts]
         print("controll points to add", control_pts_x, control_pts_y, sep="\n", end="\n\n")
@@ -106,11 +107,15 @@ class spline:
         #print("controll points to add", control_pts_x, control_pts_y, sep="\n", end="\n\n")
 
         print("index, len ctrl pts to insert = ", index, len(ctrl_pts), end="\n\n")
+
         control_pts_x = [p.x for p in self.control_points]
         control_pts_y = [p.y for p in self.control_points]
         print("controll points before insert", control_pts_x, control_pts_y, sep="\n")
-        #self.control_points = self.control_points[:(index+1)] + ctrl_pts + self.control_points[(index+self.degree+1):]
-        self.control_points = self.control_points[:(index-self.degree)] + ctrl_pts + self.control_points[(index-1):]
+        self.control_points = self.control_points[:(index-self.degree+1)] + ctrl_pts + self.control_points[(index):]
+
+        self.knots.insert(t)
+
+        print("knots after insert: ",self.knots.knots[3:-3], end="\n\n")
         control_pts_x = [p.x for p in self.control_points]
         control_pts_y = [p.y for p in self.control_points]
         print("controll points after insert", control_pts_x, control_pts_y, sep="\n", end="\n\n")
