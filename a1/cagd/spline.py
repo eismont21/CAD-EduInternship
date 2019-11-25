@@ -84,41 +84,11 @@ class spline:
     #adjusts the control points such that it represents the same function,
     #but with an added knot
     def insert_knot(self, t):
-        print("knot to insert:", t)
-        print("knots before insert: ",self.knots.knots[3:-3])
-        #self.knots.insert(t)
-        #print("knots after insert: ",self.knots.knots[3:-3], end="\n\n")
-        index = self.knots.knot_index(t)
-
-        #ctrl_pts =[]
-        #a = (t-self.knots[index-1])/(self.knots[index-1+self.degree] - self.knots[index-1])
-        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 2])+a*self.control_points[index-1])
-        #a = (t-self.knots[index-2])/(self.knots[index-2+self.degree] - self.knots[index-2])
-        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 3])+a*self.control_points[index-2])
-        #a = (t-self.knots[index-3])/(self.knots[index-3+self.degree] - self.knots[index-3])
-        #ctrl_pts.append((vec2(1,1) - a*self.control_points[index - 4])+a*self.control_points[index-3])
         ctrl_pts = self.de_boor(t, 3)
-        control_pts_x = [p.x for p in ctrl_pts]
-        control_pts_y = [p.y for p in ctrl_pts]
-        print("controll points to add", control_pts_x, control_pts_y, sep="\n", end="\n\n")
-        #ctrl_pts = self.de_boor(t, 3)
-        #control_pts_x = [p.x for p in ctrl_pts]
-        #control_pts_y = [p.y for p in ctrl_pts]
-        #print("controll points to add", control_pts_x, control_pts_y, sep="\n", end="\n\n")
-
-        print("index, len ctrl pts to insert = ", index, len(ctrl_pts), end="\n\n")
-
-        control_pts_x = [p.x for p in self.control_points]
-        control_pts_y = [p.y for p in self.control_points]
-        print("controll points before insert", control_pts_x, control_pts_y, sep="\n")
-        self.control_points = self.control_points[:(index-self.degree+1)] + ctrl_pts + self.control_points[(index):]
-
+        index = self.knots.knot_index(t)
+        self.control_points = self.control_points[:(index-self.degree+1)] + ctrl_pts + self.control_points[index:]
         self.knots.insert(t)
 
-        print("knots after insert: ",self.knots.knots[3:-3], end="\n\n")
-        control_pts_x = [p.x for p in self.control_points]
-        control_pts_y = [p.y for p in self.control_points]
-        print("controll points after insert", control_pts_x, control_pts_y, sep="\n", end="\n\n")
 
     def get_axis_aligned_bounding_box(self):
         min_vec = copy.copy(self.control_points[0])
@@ -300,27 +270,12 @@ class spline:
     #the returned spline is off from the exact parallel by at most eps
     def generate_parallel(self, dist, eps):
         assert(self.degree == 3)
-        #s_parallel = spline(3)
-        #s_parallel.knots = self.knots
-        pts = []
-
-        knotss = [self(t) for t in self.knots]
-        for i in range(len(knotss)):
-            #print("p = ", p.x, p.y)
-            tang = self.tangent(self.knots[i])
-            x = (tang.y/sqrt(tang.x**2 + tang.y**2))*dist
-            y = -(tang.x/sqrt(tang.x**2 + tang.y**2))*dist
-            pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
-
-        pts_x = [p.x for p in pts]
-        pts_y = [p.y for p in pts]
-        #print(pts_x, pts_y, sep="\n")
-        s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts[3:-3])
+        s = self.construct_parallel(dist)
 
         #"Setzen Sie daher die Knoten des parallelen Splines auf die Knoten des Eingabesplines".
         self.knots = s.knots
-        #knotss = [self(t) for t in self.knots]
-        knotss_new = [s(t) for t in s.knots]
+        knotss = [self(t) for t in self.knots]
+        knotss_new = [s(t) for t in s.knots[3:-3]]
         for i in range(len(knotss_new)-1):
             #old spline
             middle_x = (knotss[i+1].x + knotss[i].x)/2
@@ -330,35 +285,26 @@ class spline:
             middle_y2 = (knotss_new[i+1].y + knotss_new[i].y)/2
             #Jetzt soll in der Mitte zwischen zwei Knoten die Distanz der Splines berechnet werden.
             middle_dist = sqrt((middle_x-middle_x2)**2+(middle_y-middle_y2)**2)
-
             if (abs(middle_dist-dist) > eps):
                 #Bei einer Abweichung von mehr als eps von der geforderten Distanz soll an dieser Stelle
                 #ein neuer Knoten in den originalen Spline eingefügt werden um eine bessere Approximation zu gewinnen.
+                self.insert_knot((self.knots[3:-3][i+1] + self.knots[3:-3][i])/2)
 
-                # README
-                # если ты раскоммитишь след строчку добавления, то получишь ошибку питона, я хз почему, уже заебавси
-                self.insert_knot((self.knots[i+1] + self.knots[i])/2)
-                #continue
+        s = self.construct_parallel(dist)
 
-                #print(knotss[i].x, knotss_new[i].x, knotss[i].y, knotss_new[i].y, abs(middle_dist-dist))
-        knotss = [self(t) for t in self.knots[3:-3]]
-        pts_x = [p.x for p in knotss]
-        pts_y = [p.y for p in knotss]
-        print(pts_x, pts_y, sep="\n")
-        print("self knots", self.knots.knots[3:-3])
+        return s
+
+    def construct_parallel(self, dist):
         pts = []
+        knotss = [self(t) for t in self.knots[3:-3]]
+
         for i in range(len(knotss)):
-            #print("p = ", p.x, p.y)
             tang = self.tangent(self.knots[3:-3][i])
-            #print("tang = ", tang.x, tang.y)
             x = (tang.y/sqrt(tang.x**2 + tang.y**2))*dist
             y = -(tang.x/sqrt(tang.x**2 + tang.y**2))*dist
-            print("x, y = ", x, y)
             pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
 
-        pts_x = [p.x for p in pts]
-        pts_y = [p.y for p in pts]
-        print(pts_x, pts_y, sep="\n")
+
         s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts)
         return s
 
