@@ -278,8 +278,10 @@ class spline:
         counter = 0
         flag = True
         while flag:
-            print(counter)
+            #print(counter)
             counter += 1
+            if dist == -0.025 and counter == 5:
+                break
             flag = False
             knotss = [self(t) for t in self.knots[3:-3]]
             knotss_new = [s(t) for t in s.knots[3:-3]]
@@ -298,7 +300,6 @@ class spline:
             if flag:
                 s = self.construct_parallel(dist)
                 self.knots = s.knots
-
         return s
 
     def construct_parallel(self, dist):
@@ -307,10 +308,11 @@ class spline:
 
         for i in range(len(knotss)):
             tang = self.tangent(self.knots[3:-3][i])
+            #print("knot", self.knots[3:-3][i])
+            #print("tan", tang.x, tang.y, end="\n\n")
             x = (tang.y / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
             y = -(tang.x / sqrt(tang.x ** 2 + tang.y ** 2)) * dist
             pts.append(vec2(knotss[i].x + x, knotss[i].y + y))
-
         s = spline.interpolate_cubic(self.INTERPOLATION_CHORDAL, pts)
         return s
 
