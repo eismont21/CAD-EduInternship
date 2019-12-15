@@ -116,11 +116,20 @@ def marching_cubes_3d(f, xmin=XMIN, xmax=XMAX, ymin=YMIN, ymax=YMAX, zmin=ZMIN, 
     return mesh
 
 
-def circle_function(x, y, z):
+def circle(x, y, z):
     return math.sqrt(x*x + y*y + z*z) - ISOVALUE
 
+def octaeder(x, y, z):
+    return abs(x) + abs(y) + abs(z) - ISOVALUE
+
+def torus(x, y, z):
+    return (x**2 + y**2 + z**2 +0.375)**2 - 2*(x**2 + y**2)
+
+def cube(x, y, z):
+    return max(abs(x), abs(y), abs(z)) - ISOVALUE
 
 if __name__ == "__main__":
-    mesh = marching_cubes_3d(circle_function)
-    mesh.export_in_off("output")
-    mesh.export_in_obj("output")
+    mesh = marching_cubes_3d(cube)
+    fileName = "cube"
+    mesh.export_in_off(fileName)
+    mesh.export_in_obj(fileName)
