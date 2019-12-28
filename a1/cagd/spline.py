@@ -1,5 +1,6 @@
 #! /usr/bin/python
 
+from cagd.bezier import bezier_surface, bezier_patches
 from cagd.vec import vec2, vec3
 from cagd.polyline import polyline
 import cagd.utils as utils
@@ -343,6 +344,66 @@ class spline_surface:
         points1 = len(k1) == p1 + d1 + 1
         points2 = len(k2) == p2 + d2 + 1
         return knots and points1 and points2
+    
+    def insert_knot(self, direction, t):
+        if direction == self.DIR_U:
+            self.__insert_knot_u(t)
+        elif direction == self.DIR_V:
+            self.__insert_knot_v(t)
+        else:
+            assert(False)
+
+    def __insert_knot_v(self, t):
+        du, dv = self.degree
+        ku, kv = self.knots
+        nu = len(self.control_points)
+        nv = len(self.control_points[0])
+        for i in range(nu):
+            row = self.control_points[i]
+            spl = spline(du)
+            spl.control_points = copy.copy(row)
+            spl.knots = copy.deepcopy(kv)
+            spl.insert_knot(t)
+            self.control_points[i] = spl.control_points
+        kv.insert(t)
+
+    def __insert_knot_u(self, t):
+        du, dv = self.degree
+        ku, kv = self.knots
+        nu = len(self.control_points)
+        nv = len(self.control_points[0])
+        new_control_points = [[None for i in range(nv)] for j in range(nu+1)]
+        for i in range(nv):
+            col = [self.control_points[j][i] for j in range(nu)]
+            spl = spline(dv)
+            spl.control_points = col
+            spl.knots = copy.deepcopy(ku)
+            spl.insert_knot(t)
+            for j in range(nu+1):
+                new_control_points[j][i] = spl.control_points[j]
+        self.control_points = new_control_points
+        ku.insert(t)
+
+    def to_bezier_patches(self):
+        patches = bezier_patches()
+        du, dv = self.degree
+        nu = len(self.control_points)
+        nv = len(self.control_points[0])
+        #TODO: adjust multiplicity of knots
+    
+        nbu = int((nu-1)/du)
+        nbv = int((nv-1)/dv)
+        for i in range(nbu):
+            for j in range(nbv):
+                b = bezier_surface((du, dv))
+                pts = [[None for i in range(dv+1)] for j in range(du+1)]
+                for k in range(du+1):
+                    for l in range(dv+1):
+                        pts[k][l] = self.control_points[du*i+k][dv*j+l]
+                b.control_points = pts
+                patches.append(b)
+        return patches
+
 
     def evaluate(self, u, v):
         s1, s2 = self.support()
