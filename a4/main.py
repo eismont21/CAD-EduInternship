@@ -98,11 +98,13 @@ def marching_cubes_3d(f):
     """Iterates over a cells of size one between the specified range, and evaluates f to produce
         a boundary by Marching Cubes. Returns a Mesh object."""
     # For each cube, evaluate independently.
-    # If this wasn't demonstration code, you might actually evaluate them together for efficiency
     mesh = Mesh()
-    for x in range(XMIN, XMAX):
-        for y in range(YMIN, YMAX):
-            for z in range(ZMIN, ZMAX):
+    x_dec_interval = [x / 10 for x in range(XMIN*10, XMAX*10)]
+    y_dec_interval = [x / 10 for x in range(YMIN*10, YMAX*10)]
+    z_dec_interval = [x / 10 for x in range(ZMIN*10, ZMAX*10)]
+    for x in x_dec_interval:
+        for y in y_dec_interval:
+            for z in z_dec_interval:
                 cell_mesh = marching_cubes_3d_single_cell(f, vec3(x, y, z))
                 mesh.extend(cell_mesh)
     return mesh
@@ -125,7 +127,7 @@ def cube(v):
 
 
 if __name__ == "__main__":
-    mesh = marching_cubes_3d(octaeder)
-    fileName = "octaeder"
+    mesh = marching_cubes_3d(circle)
+    fileName = "circle"
     mesh.export_in_off(fileName)
     mesh.export_in_obj(fileName)
