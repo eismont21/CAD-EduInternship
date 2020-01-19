@@ -97,7 +97,9 @@ class bezier_surface:
         assert (d1 >= 0 and d2 >= 0)
         self.degree = degree
         self.control_points = [[None for i in range(d2 + 1)] for j in range(d1 + 1)]
-        self.color = "black"
+        white = (1,1,1)
+        self.color = (white, white, white, white)
+        self.curveature = (None, None, None, None)
 
     def set_control_point(self, index1, index2, val):
         assert (index1 >= 0 and index1 <= self.degree[0])
@@ -111,6 +113,17 @@ class bezier_surface:
 
     def evaluate(self, t1, t2):
         return self.__de_casteljeau(t1, t2, (1, 1))[0][0]
+
+    #sets the colors at the corners
+    #c00 is the color at u=v=0, c01 is the color at u=0 v=1, etc
+    #a color is a tuple (r,g,b) with values between 0 an 1
+    def set_colors(self, c00, c01, c10, c11):
+        self.color = (c00, c01, c10, c11)
+
+    #sets the curveature at the corners
+    #c00 is the curveature at u=v=0, c01 is the curveature at u=0 v=1, etc
+    def set_curveature(self, c00, c01, c10, c11):
+        self.curveature = (c00, c01, c10, c11)
 
     def __call__(self, t):
         t1, t2 = t
@@ -149,14 +162,112 @@ class bezier_surface:
     def normal(self, t1, t2):
         pass
 
-    def get_color(self):
-        return self.color
-
-    def set_color(self, color):
-        self.color = color
-
     def get_derivative(self, direction):
         pass
 
     def subdivide(self, t1, t2):
+        b0,b1 = self.__subdivide_u(t1)
+        b00,b01 = b0.__subdivide_v(t2)
+        b10,b11 = b1.__subdivide_v(t2)
+        return [b00, b01, b10, b11]
+
+    def __subdivide_u(self, t):
+        du, dv = self.degree
+        left = bezier_surface((du, dv))
+        right = bezier_surface((du, dv))
+        for k in range(du+1):
+            pts = self.__de_casteljeau(t, 0, (du-k+1, dv+1))
+            left.control_points[k] = pts[0]
+            right.control_points[k] = pts[-1]
+        return (left, right)
+
+    def __subdivide_v(self, t):
+        du, dv = self.degree
+        left = bezier_surface((du, dv))
+        right = bezier_surface((du, dv))
+        for k in range(dv+1):
+            pts = self.__de_casteljeau(0, t, (du+1, dv-k+1))
+            for i in range(dv+1):
+                left.control_points[i][k] = pts[i][0]
+                right.control_points[i][k] = pts[i][-1]
+        return (left, right)
+        
+
+
+class bezier_patches:
+    CURVEATURE_GAUSSIAN = 0
+    CURVEATURE_AVERAGE = 1
+    CURVEATURE_PRINCIPAL_MAX = 2 #Maximale Hauptkruemmung
+    CURVEATURE_PRINCIPAL_MIN = 3 #Minimale Hauptkruemmung
+    COLOR_MAP_LINEAR = 4
+    COLOR_MAP_CUT = 5
+    COLOR_MAP_CLASSIFICATION = 6
+
+    def __init__(self):
+        self.patches = []
+
+    def __len__(self):
+        return len(self.patches)
+
+    def __getitem__(self, p):
+        return self.patches[p]
+
+    def __setitem__(self, i, p):
+        self.patches[i] = p
+
+    def __delitem__(self, p):
+        del self.patches[p]
+
+    def __iter__(self):
+        return iter(self.patches)
+
+    def append(self, p):
+        self.patches.append(p)
+
+    #refines patches by subdividing each patch into four new patches
+    #there are 4^num times more patches after calling this function
+    def refine(self, num):
+        for i in range(num):
+            new_patches = bezier_patches()
+            for p in self:
+                new = p.subdivide(0.5, 0.5)
+                for n in new:
+                    new_patches.append(n)
+            self.patches = new_patches
+
+    def visualize_curveature(self, curveature_mode, color_map):
+        #calculate curveatures at each corner point
+        #set colors according to color map
         pass
+
+    def export_off(self):
+        def export_point(p):
+            return str(p.x) + " " + str(p.y) + " " + str(p.z)
+        def export_colors(c):
+            s = ""
+            for x in c:
+                s += str(x)
+                s += " "
+            s += "1" #opacity
+            return s
+
+        s = "CBEZ333\n"
+        for patch in self:
+            #coordinates
+            for row in patch.control_points:
+                for p in row:
+                    s += export_point(p)
+                    s += "\n"
+
+            #colors
+            s += export_colors(patch.color[0])
+            s += "\n"
+            s += export_colors(patch.color[2])
+            s += "\n"
+            s += export_colors(patch.color[1])
+            s += "\n"
+            s += export_colors(patch.color[3])
+            s += "\n"
+            s += "\n"
+
+        return s
