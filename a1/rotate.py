@@ -5,6 +5,8 @@ from cagd.spline import spline, spline_surface, knots
 from cagd.bezier import bezier_surface, bezier_patches
 from cagd.vec import vec2, vec3
 import cagd.scene_2d as scene_2d
+import math
+from math import *
 
 
 #generates a rotational surface by rotating around the z axis
@@ -12,7 +14,49 @@ import cagd.scene_2d as scene_2d
 #num_samples refers to the number of interpolation points in the rotational direction
 #returns a spline surface in three dimensions
 def generate_rotation_surface(spl, num_samples):
-    pass
+    ss = spline_surface(3)
+
+    # Jeder Kontrollpunkt des Eingabesplines müssen um die z-Achse rotiert werden
+    d = spl.control_points
+    c = [[vec3(0, 0, 0)] * num_samples for i in range(len(d))]
+    for i in range(len(d)):
+        for j in range(num_samples):
+            k_x = d[i].x * math.cos(2 * math.pi * j / num_samples)
+            k_y = d[i].x * math.sin(2 * math.pi * j / num_samples)
+            k_z = d[i].y
+            c[i][j] = vec3(k_x, k_y, k_z)
+
+    sc = scene_2d.scene()
+    sc.set_resolution(900)
+
+    #Für jedes feste i interpolieren wir die Punkte ci0, . . . , ci,R−1 wie in Versuch 2
+    b = [[vec3(0, 0, 0)] * (num_samples+3) for i in range(len(d))]
+    for i in range(len(d)):
+        pts = [vec2(0, 0)] * num_samples
+        for j in range(num_samples):
+            pts[j] = vec2(c[i][j].x, c[i][j].y)
+        s = spline.interpolate_cubic_periodic(pts)
+        s.set_color("#0000ff")
+        sc.add_element(s)
+        #sc.write_image()
+        #sc.show()
+        #Kontrollpunkte bij ∈ R3. (Für festes i liegen die bij in der Ebene z = zi.)
+        for k in range(num_samples+3):
+            l_x = s.control_points[k].x
+            l_y = s.control_points[k].y
+            l_z = d[i].y
+            b[i][k] = vec3(l_x, l_y, l_z)
+
+    u = spl.knots
+    v = s.knots
+
+    #sc.write_image()
+    #sc.show()
+
+    ss.knots = (u, v)
+    ss.control_points = b
+
+    return ss
 
 pts = [ vec2(0.05,6),
         vec2(0.2,6),
