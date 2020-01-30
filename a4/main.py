@@ -15,7 +15,7 @@ class Triangle:
         return Triangle(f(self.v1), f(self.v2), f(self.v3))
 
 
-"""Vertices, and faces between those vertices."""
+"""The class representing vertices and faces between those vertices."""
 
 
 class Mesh:
@@ -58,8 +58,6 @@ ISOVALUE = 2.5
 
 def edge_to_boundary_vertex(edge, f_eval, xyz):
     """Returns the vertex in the middle of the specified edge"""
-    # Find the two vertices specified by this edge, and interpolate between
-    # them according to adapt, as in the 2d case
     p1, p2 = CubeEdges[edge]
     v1 = f_eval[p1]
     v2 = f_eval[p2]
@@ -69,12 +67,12 @@ def edge_to_boundary_vertex(edge, f_eval, xyz):
     return xyz + q
 
 
-def marching_cubes_3d_single_cell(f, xyz):
+def marching_cubes_3d_single_cell(f, xyz, k):
     # Evaluate f on each vertex of the cube
     f_eval = [f(xyz + vec3(v[0], v[1], v[2])) for v in CubeVertices]
-    # Determine which case we are
+    # Determine which case it is
     case = sum(2 ** v for v in range(8) if f_eval[v] > 0)
-    # what faces do we need (in terms of edges)
+    # what faces are needed (in terms of edges)
     faces = CubeTriangles[case]
 
     output_verts = []
@@ -99,13 +97,16 @@ def marching_cubes_3d(f):
         a boundary by Marching Cubes. Returns a Mesh object."""
     # For each cube, evaluate independently.
     mesh = Mesh()
-    x_dec_interval = [x / 10 for x in range(XMIN*10, XMAX*10)]
-    y_dec_interval = [x / 10 for x in range(YMIN*10, YMAX*10)]
-    z_dec_interval = [x / 10 for x in range(ZMIN*10, ZMAX*10)]
+    #step 0.1
+    k = 10
+    x_dec_interval = [x / k for x in range(XMIN*k, XMAX*k)]
+    y_dec_interval = [x / k for x in range(YMIN*k, YMAX*k)]
+    z_dec_interval = [x / k for x in range(ZMIN*k, ZMAX*k)]
+
     for x in x_dec_interval:
         for y in y_dec_interval:
             for z in z_dec_interval:
-                cell_mesh = marching_cubes_3d_single_cell(f, vec3(x, y, z))
+                cell_mesh = marching_cubes_3d_single_cell(f, vec3(x, y, z), k)
                 mesh.extend(cell_mesh)
     return mesh
 
