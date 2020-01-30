@@ -26,9 +26,6 @@ def generate_rotation_surface(spl, num_samples):
             k_z = d[i].y
             c[i][j] = vec3(k_x, k_y, k_z)
 
-    sc = scene_2d.scene()
-    sc.set_resolution(900)
-
     #Für jedes feste i interpolieren wir die Punkte ci0, . . . , ci,R−1 wie in Versuch 2
     b = [[vec3(0, 0, 0)] * (num_samples+3) for i in range(len(d))]
     for i in range(len(d)):
@@ -36,10 +33,6 @@ def generate_rotation_surface(spl, num_samples):
         for j in range(num_samples):
             pts[j] = vec2(c[i][j].x, c[i][j].y)
         s = spline.interpolate_cubic_periodic(pts)
-        s.set_color("#0000ff")
-        sc.add_element(s)
-        #sc.write_image()
-        #sc.show()
         #Kontrollpunkte bij ∈ R3. (Für festes i liegen die bij in der Ebene z = zi.)
         for k in range(num_samples+3):
             l_x = s.control_points[k].x
@@ -49,9 +42,6 @@ def generate_rotation_surface(spl, num_samples):
 
     u = spl.knots
     v = s.knots
-
-    #sc.write_image()
-    #sc.show()
 
     ss.knots = (u, v)
     ss.control_points = b
@@ -80,7 +70,7 @@ spl = spline.interpolate_cubic(spline.INTERPOLATION_CHORDAL, pts)
 #sc.write_image()
 #sc.show()
 
-surface = generate_rotation_surface(spl, 12)
+surface = generate_rotation_surface(spl, 32)
 
 bezier_patches = surface.to_bezier_patches()
 

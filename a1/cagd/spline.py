@@ -393,14 +393,10 @@ class spline_surface:
         patches = bezier_patches()
         du = self.degree
         dv = self.degree
-        nu = len(self.control_points)
-        nv = len(self.control_points[0])
+
         #Die Vielfachheiten der Knoten müssen angepasst werden.
 
         # Wir fügen in den u-Knotenvektor solange Knoten ein, bis jeder innere Knoten die Vielfachheit m hat.
-        #for i in range(len(self.knots[0])):
-            #print(self.knots[0][i], end=" ")
-        #print()
         i = 4
         while (i < len(self.knots[0])-4):
             p = self.cal_multiplicity(self.knots[0], self.knots[0][i], 4, len(self.knots[0])-4)
@@ -408,13 +404,8 @@ class spline_surface:
                 self.insert_knot(spline_surface.DIR_U, self.knots[0][i])
                 p = p + 1
             i = i + 1
-        #for i in range(len(self.knots[0])):
-            #print(self.knots[0][i], end=" ")
 
         # Wir fügen in den v-Knotenvektor solange Knoten ein, bis jeder innere Knoten die Vielfachheit n hat.
-        #for i in range(len(self.knots[1])):
-            #print(self.knots[1][i], end=" ")
-        #print()
         i = 4
         while (i < len(self.knots[1]) - 4):
             p = self.cal_multiplicity(self.knots[1], self.knots[1][i], 4, len(self.knots[1])-4)
@@ -422,9 +413,9 @@ class spline_surface:
                 self.insert_knot(spline_surface.DIR_V, self.knots[1][i])
                 p = p + 1
             i = i + 1
-        #for i in range(len(self.knots[1])):
-            #print(self.knots[1][i], end=" ")
-    
+
+        nu = len(self.control_points)
+        nv = len(self.control_points[0])
         nbu = int((nu-1)/du)
         nbv = int((nv-1)/dv)
         for i in range(nbu):
