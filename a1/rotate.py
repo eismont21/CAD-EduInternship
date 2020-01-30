@@ -70,7 +70,7 @@ spl = spline.interpolate_cubic(spline.INTERPOLATION_CHORDAL, pts)
 #sc.write_image()
 #sc.show()
 
-surface = generate_rotation_surface(spl, 32)
+surface = generate_rotation_surface(spl, 12)
 
 bezier_patches = surface.to_bezier_patches()
 
