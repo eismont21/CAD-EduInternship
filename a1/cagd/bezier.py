@@ -342,13 +342,13 @@ class bezier_patches:
     def cal_color(self, x):
         assert (0. <= x <= 1.)
         if (0. <= x <= 0.25):
-            return vec3(0, 4*x, 1)
+            return (0, 4*x, 1)
         elif (0.25 < x <= 0.5):
-            return vec3(0, 1, 2-4*x)
+            return (0, 1, 2-4*x)
         elif (0.5 < x <= 0.75):
-            return vec3(4*x-2, 1, 0)
+            return (4*x-2, 1, 0)
         elif (0.75 < x <= 1.):
-            return vec3(1, 4-4*x, 0)
+            return (1, 4-4*x, 0)
 
     def calculate_derivative(self, control_points, n_derivatives):
         import numpy as np
