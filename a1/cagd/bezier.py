@@ -236,6 +236,7 @@ class bezier_patches:
             self.patches = new_patches
 
     def visualize_curveature(self, curveature_mode, color_map):
+
         #calculate curveatures at each corner point
         #set colors according to color map
         pass

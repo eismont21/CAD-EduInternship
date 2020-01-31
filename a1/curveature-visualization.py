@@ -22,7 +22,7 @@ surface.knots = (ku, kv)
 
 bezier_patches = surface.to_bezier_patches()
 bezier_patches.refine(1) #refine surface into more patches for more detailed coloring
-bezier_patches.visualize_curveature(bezier_patches.CURVEATURE_GAUSSIAN, bezier_patches.LINEAR)
+bezier_patches.visualize_curveature(bezier_patches.CURVEATURE_GAUSSIAN, bezier_patches.COLOR_MAP_LINEAR)
 
 path = "surfaces.off"
 f = open(path, 'w')

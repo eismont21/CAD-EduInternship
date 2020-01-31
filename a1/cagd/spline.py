@@ -326,8 +326,11 @@ class spline_surface:
     # creates a spline of degrees n,m
     # degree is a tuple (n,m)
     def __init__(self, degree):
-        du = degree
-        dv = degree
+        if type(degree) is tuple:
+            (du, dv) = degree
+        else:
+            du = degree
+            dv = degree
         assert (du >= 1 and dv >= 1)
         self.degree = degree
         self.knots = (None, None)  # tuple of both knot vectors
@@ -355,8 +358,11 @@ class spline_surface:
             assert(False)
 
     def __insert_knot_v(self, t):
-        du = self.degree
-        dv = self.degree
+        if type(self.degree) is tuple:
+            (du, dv) = self.degree
+        else:
+            du = self.degree
+            dv = self.degree
         ku = self.knots[0]
         kv = self.knots[1]
         nu = len(self.control_points)
@@ -371,8 +377,11 @@ class spline_surface:
         kv.insert(t)
 
     def __insert_knot_u(self, t):
-        du = self.degree
-        dv = self.degree
+        if type(self.degree) is tuple:
+            (du, dv) = self.degree
+        else:
+            du = self.degree
+            dv = self.degree
         ku = self.knots[0]
         kv = self.knots[1]
         nu = len(self.control_points)
@@ -390,9 +399,13 @@ class spline_surface:
         ku.insert(t)
 
     def to_bezier_patches(self):
-        patches = bezier_patches()
-        du = self.degree
-        dv = self.degree
+
+        patches = bezier_patches() #ADDED LINE
+        if type(self.degree) is tuple:
+            (du, dv) = self.degree
+        else:
+            du = self.degree
+            dv = self.degree
 
         #Die Vielfachheiten der Knoten müssen angepasst werden.
 
