@@ -263,32 +263,33 @@ class bezier_patches:
         # Die Krümmungswerte müssen entsprechend dem Parameter color_map auf Farbwerte abgebildet werden.
 
         x = [0.] * 100
+        result = [vec3(0,0,0)] * 100
         # Die Funktionen f1 : IR → [0, 1], die jedem Krümmungswert einen Wert aus dem Bereich [0, 1]
         # zuordnen; auf das Ergebnis wird die Hilfsfunktion h angewendet
         for i in range(len(x)):
             if (x[i] < 0):
-                x[i] = self.cal_color(0)
+                result[i] = self.cal_color(0)
             elif (1 < x[i]):
-                x[i] = self.cal_color(1)
+                result[i] = self.cal_color(1)
             else:
-                x[i] = self.cal_color(x[i])
+                result[i] = self.cal_color(x[i])
 
         # Mit der Funktion f2 wird κmin auf 0, κmax auf 1 abgebildet und die Werte dazwischen
         # werden linear interpoliert:
         x_min = min(x)
         x_max = max(x)
         for i in range(len(x)):
-            x[i] = self.cal_color((x[i] - x_min)/(x_max - x_min))
+            result[i] = self.cal_color((x[i] - x_min)/(x_max - x_min))
 
         # Die Funktion f3, die die hyperbolischen Punkte blau,
         # die parabolischen und die Flachpunkte grün und die elliptischen Punkte rot darstellt
         for i in range(len(x)):
             if (x[i] < 0):
-                x[i] = self.cal_color(0)
+                result[i] = self.cal_color(0)
             elif (1 < x[i]):
-                x[i] = self.cal_color(0.5)
+                result[i] = self.cal_color(0.5)
             else:
-                x[i] = self.cal_color(1)
+                result[i] = self.cal_color(1)
 
     # Die Hilfsfunktion h: [0, 1] → [0, 1]3, die 0 auf (0, 0, 1) (blau),
     # 1/2 auf (0, 1, 0) (grün) und 1 auf (1, 0, 0) (rot) abbildet und
