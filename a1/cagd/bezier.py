@@ -287,29 +287,29 @@ class bezier_patches:
             patch.set_curveature(curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1])
 
 
-        #set colors according to color map
-        # Die Krümmungswerte müssen entsprechend dem Parameter color_map auf Farbwerte abgebildet werden.
+            #set colors according to color map
+            # Die Krümmungswerte müssen entsprechend dem Parameter color_map auf Farbwerte abgebildet werden.
 
-        k00, k01, k11, k10 = 0,0,0,1
+            k00, k01, k10, k11 = curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1]
 
-        if (color_map == bezier_patches.COLOR_MAP_CUT):
-            c00 = self.func1(k00)
-            c01 = self.func1(k01)
-            c10 = self.func1(k10)
-            c11 = self.func1(k11)
-        elif (color_map == bezier_patches.COLOR_MAP_LINEAR):
-            k_min = min(k00, k01, k10, k11)
-            k_max = max(k00, k01, k10, k11)
-            c00 = self.func2(k_min, k_max, k00)
-            c01 = self.func2(k_min, k_max, k01)
-            c10 = self.func2(k_min, k_max, k10)
-            c11 = self.func2(k_min, k_max, k11)
-        elif (color_map == bezier_patches.COLOR_MAP_CLASSIFICATION):
-            c00 = self.func3(k00)
-            c01 = self.func3(k01)
-            c10 = self.func3(k10)
-            c11 = self.func3(k11)
-        patch.set_colors(c00, c01, c10, c11)
+            if (color_map == bezier_patches.COLOR_MAP_CUT):
+                c00 = self.func1(k00)
+                c01 = self.func1(k01)
+                c10 = self.func1(k10)
+                c11 = self.func1(k11)
+            elif (color_map == bezier_patches.COLOR_MAP_LINEAR):
+                k_min = min(k00, k01, k10, k11)
+                k_max = max(k00, k01, k10, k11)
+                c00 = self.func2(k_min, k_max, k00)
+                c01 = self.func2(k_min, k_max, k01)
+                c10 = self.func2(k_min, k_max, k10)
+                c11 = self.func2(k_min, k_max, k11)
+            elif (color_map == bezier_patches.COLOR_MAP_CLASSIFICATION):
+                c00 = self.func3(k00)
+                c01 = self.func3(k01)
+                c10 = self.func3(k10)
+                c11 = self.func3(k11)
+            patch.set_colors(c00, c01, c10, c11)
 
     # Die Funktionen f1 : IR → [0, 1], die jedem Krümmungswert einen Wert aus dem Bereich [0, 1]
     # zuordnen; auf das Ergebnis wird die Hilfsfunktion h angewendet
