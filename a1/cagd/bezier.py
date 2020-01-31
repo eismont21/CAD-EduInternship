@@ -327,17 +327,6 @@ class bezier_patches:
             w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
         return w
 
-    def cal_frobenius_inner_product(self, a, b):
-        assert ((len(a) == len(b)) and (len(a[0]) == len(b[0])))
-        c = 0
-        for i in range(len(a)):
-            for j in range(len(a[0])):
-                c += a[i][j]*b[i][j]
-        return c
-
-
-
-
     def export_off(self):
         def export_point(p):
             return str(p.x) + " " + str(p.y) + " " + str(p.z)
