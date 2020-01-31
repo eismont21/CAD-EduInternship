@@ -256,7 +256,15 @@ class bezier_patches:
         for patch in self:
             w = self.calculate_derivative(np.array(patch.control_points), 1)
 
+        E = self.cal_frobenius_inner_product(bu, bu)
+        F = self.cal_frobenius_inner_product(bu, bv)
+        G = self.cal_frobenius_inner_product(bv, bv)
 
+        N =
+
+        e = self.cal_frobenius_inner_product(N, buu)
+        f = self.cal_frobenius_inner_product(N, buv)
+        g = self.cal_frobenius_inner_product(N, bvv)
 
 
         #set colors according to color map
@@ -313,6 +321,17 @@ class bezier_patches:
             n = len(w[i])
             w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
         return w
+
+    def cal_frobenius_inner_product(self, a, b):
+        assert ((len(a) == len(b)) and (len(a[0]) == len(b[0])))
+        c = 0
+        for i in range(len(a)):
+            for j in range(len(a[0])):
+                c += a[i][j]*b[i][j]
+        return c
+
+
+
 
     def export_off(self):
         def export_point(p):
