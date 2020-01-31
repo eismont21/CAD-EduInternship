@@ -236,7 +236,7 @@ class bezier_patches:
             self.patches = new_patches
 
     def visualize_curveature(self, curveature_mode, color_map):
-
+        import numpy as np
         #calculate curveatures at each corner point
 
 
@@ -288,7 +288,31 @@ class bezier_patches:
         elif (0.75 < x <= 1.):
             h_x = vec3(1, 4-4*x, 0)
         return h_x
+        (m, n) = (4, 4)
+        for patch in self:
+            b = patch.control_points
+            #B(bu)
+            bu = [[m*(b[i+1][j] - b[i][j]) for j in range(n)] for i in range(m-1)]
+            #B(bv)
+            bv = [[n*(b[i][j+1] - b[i][j]) for j in range(n-1)] for i in range(m)]
+            #B(buu)
+            buu = [[m*(m-1)*(b[i+2][j] - 2*b[i+1][j] + b[i][j]) for j in range(n)] for i in range(m-2)]
+            #B(buv)
+            buv = [[n*m*(b[i+1][j+1] - b[i+1][j] - b[i][j+1] + b[i][j]) for j in range(n-1)] for i in range(m-1)]
+            #B(bvv)
+            bvv = [[n*(n-1)*(b[i][j+2] - 2*b[i][j+1] + b[i][j]) for j in range(n-2)] for i in range(m)]
+        for patch in self:
+            w = self.calculate_derivative(np.array(patch.control_points), 1)
 
+        #pass
+
+    def calculate_derivative(self, control_points, n_derivatives):
+        import numpy as np
+        w = {0: control_points}
+        for i in range(n_derivatives):
+            n = len(w[i])
+            w[i + 1] = np.array([(n - 1) * (w[i][j + 1] - w[i][j]) for j in range(n - 1)])
+        return w
     def export_off(self):
         def export_point(p):
             return str(p.x) + " " + str(p.y) + " " + str(p.z)
