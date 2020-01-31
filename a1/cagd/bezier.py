@@ -256,48 +256,54 @@ class bezier_patches:
         for patch in self:
             w = self.calculate_derivative(np.array(patch.control_points), 1)
 
-        E = self.cal_frobenius_inner_product(bu, bu)
-        F = self.cal_frobenius_inner_product(bu, bv)
-        G = self.cal_frobenius_inner_product(bv, bv)
-
-        N =
-
-        e = self.cal_frobenius_inner_product(N, buu)
-        f = self.cal_frobenius_inner_product(N, buv)
-        g = self.cal_frobenius_inner_product(N, bvv)
-
 
         #set colors according to color map
         # Die Krümmungswerte müssen entsprechend dem Parameter color_map auf Farbwerte abgebildet werden.
 
-        x = [0.] * 100
-        result = [vec3(0,0,0)] * 100
-        # Die Funktionen f1 : IR → [0, 1], die jedem Krümmungswert einen Wert aus dem Bereich [0, 1]
-        # zuordnen; auf das Ergebnis wird die Hilfsfunktion h angewendet
-        for i in range(len(x)):
-            if (x[i] < 0):
-                result[i] = self.cal_color(0)
-            elif (1 < x[i]):
-                result[i] = self.cal_color(1)
-            else:
-                result[i] = self.cal_color(x[i])
+        k00, k01, k11, k10 = 0,0,0,1
 
-        # Mit der Funktion f2 wird κmin auf 0, κmax auf 1 abgebildet und die Werte dazwischen
-        # werden linear interpoliert:
-        x_min = min(x)
-        x_max = max(x)
-        for i in range(len(x)):
-            result[i] = self.cal_color((x[i] - x_min)/(x_max - x_min))
+        if (color_map == bezier_patches.COLOR_MAP_CUT):
+            c00 = self.func1(k00)
+            c01 = self.func1(k01)
+            c10 = self.func1(k10)
+            c11 = self.func1(k11)
+        elif (color_map == bezier_patches.COLOR_MAP_LINEAR):
+            k_min = min(k00, k01, k10, k11)
+            k_max = max(k00, k01, k10, k11)
+            c00 = self.func2(k_min, k_max, k00)
+            c01 = self.func2(k_min, k_max, k01)
+            c10 = self.func2(k_min, k_max, k10)
+            c11 = self.func2(k_min, k_max, k11)
+        elif (color_map == bezier_patches.COLOR_MAP_CLASSIFICATION):
+            c00 = self.func3(k00)
+            c01 = self.func3(k01)
+            c10 = self.func3(k10)
+            c11 = self.func3(k11)
 
-        # Die Funktion f3, die die hyperbolischen Punkte blau,
-        # die parabolischen und die Flachpunkte grün und die elliptischen Punkte rot darstellt
-        for i in range(len(x)):
-            if (x[i] < 0):
-                result[i] = self.cal_color(0)
-            elif (1 < x[i]):
-                result[i] = self.cal_color(0.5)
-            else:
-                result[i] = self.cal_color(1)
+    # Die Funktionen f1 : IR → [0, 1], die jedem Krümmungswert einen Wert aus dem Bereich [0, 1]
+    # zuordnen; auf das Ergebnis wird die Hilfsfunktion h angewendet
+    def func1(self, x):
+        if (x < 0):
+            return self.cal_color(0)
+        elif (1 < x):
+            return self.cal_color(1)
+        else:
+            return self.cal_color(x)
+
+    # Mit der Funktion f2 wird κmin auf 0, κmax auf 1 abgebildet und die Werte dazwischen
+    # werden linear interpoliert:
+    def func2(self, min, max, x):
+        return self.cal_color((x - min)/(max - min))
+
+    # Die Funktion f3, die die hyperbolischen Punkte blau,
+    # die parabolischen und die Flachpunkte grün und die elliptischen Punkte rot darstellt
+    def func3(self, x):
+        if (x < 0):
+            return self.cal_color(0)
+        elif (0 == x):
+            return self.cal_color(0.5)
+        else:
+            return self.cal_color(1)
 
     # Die Hilfsfunktion h: [0, 1] → [0, 1]3, die 0 auf (0, 0, 1) (blau),
     # 1/2 auf (0, 1, 0) (grün) und 1 auf (1, 0, 0) (rot) abbildet und
@@ -305,14 +311,13 @@ class bezier_patches:
     def cal_color(self, x):
         assert (0. <= x <= 1.)
         if (0. <= x <= 0.25):
-            h_x = vec3(0, 4*x, 1)
+            return vec3(0, 4*x, 1)
         elif (0.25 < x <= 0.5):
-            h_x = vec3(0, 1, 2-4*x)
+            return vec3(0, 1, 2-4*x)
         elif (0.5 < x <= 0.75):
-            h_x = vec3(4*x-2, 1, 0)
+            return vec3(4*x-2, 1, 0)
         elif (0.75 < x <= 1.):
-            h_x = vec3(1, 4-4*x, 0)
-        return h_x
+            return vec3(1, 4-4*x, 0)
 
     def calculate_derivative(self, control_points, n_derivatives):
         import numpy as np
