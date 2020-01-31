@@ -279,6 +279,7 @@ class bezier_patches:
             c01 = self.func3(k01)
             c10 = self.func3(k10)
             c11 = self.func3(k11)
+        patch.set_colors(c00, c01, c10, c11)
 
     # Die Funktionen f1 : IR → [0, 1], die jedem Krümmungswert einen Wert aus dem Bereich [0, 1]
     # zuordnen; auf das Ergebnis wird die Hilfsfunktion h angewendet
