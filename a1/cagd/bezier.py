@@ -275,7 +275,12 @@ class bezier_patches:
             bvv = [[n * (n - 1) * (b[i][j + 2] - 2 * b[i][j + 1] + b[i][j]) for j in range(n - 2)] for i in range(m)]
 
             for i,j in [(0,0), (0,1), (1,0), (1,1)]:
-                K, H = calculate_curveatures(bu[i][j], bv[i][j], buu[i][j], buv[i][j], bvv[i][j])
+                K, H = calculate_curveatures(bu[i*(len(bu)-1)][j*(len(bu[0])-1)],
+                                             bv[i*(len(bv)-1)][j*(len(bv[0])-1)],
+                                             buu[i*(len(buu)-1)][j*(len(buu[0])-1)],
+                                             buv[i*(len(buv)-1)][j*(len(buv[0])-1)],
+                                             bvv[i*(len(bvv)-1)][j*(len(bvv[0])-1)]
+                                             )
                 cond1 = H + sqrt(H*H - K)
                 cond2 = H - sqrt(H*H - K)
                 curveatures[i][j] = calculate_mode(curveature_mode, cond1, cond2)
