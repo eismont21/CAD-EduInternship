@@ -39,6 +39,9 @@ class vec3:
     def dot(self, other):
         return self.x * other.x + self.y * other.y + self.z * other.z
 
+    def cross(self, other):
+        return vec3(self.y*other.z - self.z*other.y, self.z*other.x - self.x*other.z, self.x*other.y - self.y*other.x)
+
     def __abs__(self):
         return math.sqrt(self.dot(self))
 

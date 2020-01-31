@@ -3,6 +3,7 @@
 from cagd.vec import vec2, vec3
 from cagd.polyline import polyline
 import copy
+from math import sqrt
 
 class bezier_curve:
     def __init__(self, degree):
@@ -238,8 +239,27 @@ class bezier_patches:
     def visualize_curveature(self, curveature_mode, color_map):
         import numpy as np
         #calculate curveatures at each corner point
+        def calculate_curveatures(bu, bv, buu, buv, bvv):
+            E = bu.dot(bu)
+            F = bu.dot(bv)
+            G = bv.dot(bv)
+            N = bu.cross(bv)*(1/(bu.cross(bv).dot(bu.cross(bv))))
+            e = N.dot(buu)
+            f = N.dot(buv)
+            g = N.dot(bvv)
+            K = (e*g - f*f)/(E*G - F*F)
+            H = (e*G - 2*f*F +g*E)/(2*(E*G - F*F))
+            return K, H
+        def calculate_mode(curveature_mode, cond1, cond2):
+            if (curveature_mode == self.CURVEATURE_GAUSSIAN):
+                return cond1*cond2
+            elif(curveature_mode == self.CURVEATURE_AVERAGE):
+                return (cond1+cond2)/2
+            else:
+                return -1
 
         (m, n) = (4, 4)
+        curveatures=[[0,0], [0,0]]
         for patch in self:
             b = patch.control_points
             # B(bu)
@@ -253,18 +273,13 @@ class bezier_patches:
                    range(m - 1)]
             # B(bvv)
             bvv = [[n * (n - 1) * (b[i][j + 2] - 2 * b[i][j + 1] + b[i][j]) for j in range(n - 2)] for i in range(m)]
-        for patch in self:
-            w = self.calculate_derivative(np.array(patch.control_points), 1)
 
-        E = self.cal_frobenius_inner_product(bu, bu)
-        F = self.cal_frobenius_inner_product(bu, bv)
-        G = self.cal_frobenius_inner_product(bv, bv)
-
-        N =
-
-        e = self.cal_frobenius_inner_product(N, buu)
-        f = self.cal_frobenius_inner_product(N, buv)
-        g = self.cal_frobenius_inner_product(N, bvv)
+            for i,j in [(0,0), (0,1), (1,0), (1,1)]:
+                K, H = calculate_curveatures(bu[i][j], bv[i][j], buu[i][j], buv[i][j], bvv[i][j])
+                cond1 = H + sqrt(H*H - K)
+                cond2 = H - sqrt(H*H - K)
+                curveatures[i][j] = calculate_mode(curveature_mode, cond1, cond2)
+            patch.set_curveature(curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1])
 
 
         #set colors according to color map
