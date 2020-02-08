@@ -192,7 +192,7 @@ class bezier_surface:
                 left.control_points[i][k] = pts[i][0]
                 right.control_points[i][k] = pts[i][-1]
         return (left, right)
-        
+
 
 
 class bezier_patches:
@@ -237,13 +237,12 @@ class bezier_patches:
             self.patches = new_patches
 
     def visualize_curveature(self, curveature_mode, color_map):
-        import numpy as np
         #calculate curveatures at each corner point
         def calculate_curveatures(bu, bv, buu, buv, bvv):
             E = bu.dot(bu)
             F = bu.dot(bv)
             G = bv.dot(bv)
-            N = bu.cross(bv)*(1/(bu.cross(bv).dot(bu.cross(bv))))
+            N = bu.cross(bv)/(bu.cross(bv).dot(bu.cross(bv)))
             e = N.dot(buu)
             f = N.dot(buv)
             g = N.dot(bvv)
@@ -251,15 +250,21 @@ class bezier_patches:
             H = (e*G - 2*f*F +g*E)/(2*(E*G - F*F))
             return K, H
         def calculate_mode(curveature_mode, cond1, cond2):
-            if (curveature_mode == self.CURVEATURE_GAUSSIAN):
-                return cond1*cond2
-            elif(curveature_mode == self.CURVEATURE_AVERAGE):
-                return (cond1+cond2)/2
+            if curveature_mode == self.CURVEATURE_GAUSSIAN:
+                return cond1 * cond2
+            elif curveature_mode == self.CURVEATURE_AVERAGE:
+                return (cond1 + cond2)/2
             else:
                 return -1
 
         (m, n) = (4, 4)
-        curveatures=[[0,0], [0,0]]
+
+
+        #allCurveatures = [len(self)*curveatures]
+        allCurveatures = []
+        import sys
+        k_max = sys.float_info.min
+        k_min = sys.float_info.max
         for patch in self:
             b = patch.control_points
             # B(bu)
@@ -274,7 +279,8 @@ class bezier_patches:
             # B(bvv)
             bvv = [[n * (n - 1) * (b[i][j + 2] - 2 * b[i][j + 1] + b[i][j]) for j in range(n - 2)] for i in range(m)]
 
-            for i,j in [(0,0), (0,1), (1,0), (1,1)]:
+            curveatures = [[0, 0], [0, 0]]
+            for i, j in [(0, 0), (0, 1), (1, 0), (1, 1)]:
                 K, H = calculate_curveatures(bu[i*(len(bu)-1)][j*(len(bu[0])-1)],
                                              bv[i*(len(bv)-1)][j*(len(bv[0])-1)],
                                              buu[i*(len(buu)-1)][j*(len(buu[0])-1)],
@@ -285,26 +291,28 @@ class bezier_patches:
                 cond2 = H - sqrt(H*H - K)
                 curveatures[i][j] = calculate_mode(curveature_mode, cond1, cond2)
             patch.set_curveature(curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1])
+            k_max = max(k_max, curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1])
+            k_min = min(k_min, curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1])
+            allCurveatures.append(curveatures)
 
 
             #set colors according to color map
             # Die Krümmungswerte müssen entsprechend dem Parameter color_map auf Farbwerte abgebildet werden.
-
-            k00, k01, k10, k11 = curveatures[0][0], curveatures[0][1], curveatures[1][0], curveatures[1][1]
-
-            if (color_map == bezier_patches.COLOR_MAP_CUT):
+        i = 0
+        for patch in self:
+            k00, k01, k10, k11 = allCurveatures[i][0][0], allCurveatures[i][0][1], allCurveatures[i][1][0], allCurveatures[i][1][1]
+            i += 1
+            if color_map == bezier_patches.COLOR_MAP_CUT:
                 c00 = self.func1(k00)
                 c01 = self.func1(k01)
                 c10 = self.func1(k10)
                 c11 = self.func1(k11)
-            elif (color_map == bezier_patches.COLOR_MAP_LINEAR):
-                k_min = min(k00, k01, k10, k11)
-                k_max = max(k00, k01, k10, k11)
+            elif color_map == bezier_patches.COLOR_MAP_LINEAR:
                 c00 = self.func2(k_min, k_max, k00)
                 c01 = self.func2(k_min, k_max, k01)
                 c10 = self.func2(k_min, k_max, k10)
                 c11 = self.func2(k_min, k_max, k11)
-            elif (color_map == bezier_patches.COLOR_MAP_CLASSIFICATION):
+            elif color_map == bezier_patches.COLOR_MAP_CLASSIFICATION:
                 c00 = self.func3(k00)
                 c01 = self.func3(k01)
                 c10 = self.func3(k10)
