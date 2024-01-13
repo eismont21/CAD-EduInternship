@@ -1,7 +1,7 @@
 # MARS-Praktikum
 
 ## Overview
-This repository is a collection of Python scripts implementing basic CAD algorithms from scratch, developed during an internship at KIT. It covers a range of topics from curve interpolation to surface generation and interactive modeling.
+This repository is a collection of Python scripts implementing basic CAD algorithms from scratch, developed during [an internship at KIT](https://geom.ivd.kit.edu/ss18_1362.php). It covers a range of topics from curve interpolation to surface generation and interactive modeling.
 
 ## Features
 
