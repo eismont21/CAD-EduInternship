@@ -1,23 +1,17 @@
-MARS-Praktikum
-This project encapsulates the basic CAD algorithms implementations from scratch and was developed during a internship at KIT.
-The full description of the intership (in german):
+# MARS-Praktikum
 
-Inhalt
-Kurven:
-a1)Interpolation mit kubischen B-Splines
-Dieser Versuch liefert einen Einstieg in die B-Spline-Theorie, die ein sehr mächtiges Instrument bei der Gestaltung gekrümmter Kurven und Flächen darstellt. Durch vorgegebene Punkte, beispielsweise Messdaten, soll ein natürlicher Spline gelegt und mit Hilfe des de Boor-Algorithmus ausgewertet werden.
+## Overview
+This repository is a collection of Python scripts implementing basic CAD algorithms from scratch, developed during an internship at KIT. It covers a range of topics from curve interpolation to surface generation and interactive modeling.
 
-a2)Periodische Spline-Interpolation
-Zur Interpolation und Approximation geschlossener Kurven sind sogenannte periodische Splines erforderlich. Damit sollen u. a. Kreise approximiert werden.
+## Features
 
-a3)Parallelkurven
-In dieser Aufgabe sollen Parallelkurven von integralen Splines, wie sie beispielsweise bei der Mustererstellung oder Bestimmung von Fräsbahnen auftreten, mittels obiger Interpolationsverfahren approximiert werden, indem z. B. exakt bestimmte Punkte der Parallelkurve interpoliert werden. Abhängig von einer Fehlertoleranz müssen gegebenenfalls einzelne Spline-Segmente unterteilt werden.
+### Curves
+- **Interpolation with Cubic B-Splines (a1)**: An introduction to B-Spline theory, demonstrating spline creation through given points using the de Boor algorithm.
+- **Periodic Spline Interpolation (a2)**: Techniques for interpolating and approximating closed curves, useful in scenarios like circle approximation.
+- **Parallel Curves (a3)**: Methodology for approximating parallel curves of integral splines, essential in pattern creation and milling path determination.
 
-Flächen
-a4)Rotations- und Tensorproduktflächen
-Tensorproduktflächen entstehen durch Bewegen und Variieren einer Kurve im Raum. So ergibt sich durch Verschieben einer Kurve eine sogenannte Schiebfläche, durch Rotation einer Meridiankurve eine Rotationsfläche. Sie soll durch eine integrale Tensorproduktfläche approximiert werden. Mit Hilfe des Visualisierungsprogramms geomview kann die Fläche dargestellt werden.
+### Surfaces
+- **Rotational and Tensor Product Surfaces (a4)**: Exploration of tensor product surfaces, including the creation of rotational and shift surfaces. Visualizations are facilitated through geomview.
 
-Krümmungsvisualisierung
-
-a5-a6)Interaktive Modellierung
-In diesem Versuch werden unterschiedliche Algorithmen für Dreiecksnetze implementiert.
+### Interactive Modeling
+- **Triangular Mesh Algorithms (a5-a6)**: Implementation of different algorithms for triangular meshes, enhancing interactive modeling capabilities.
